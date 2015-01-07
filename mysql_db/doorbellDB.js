@@ -19,7 +19,7 @@ module.exports.tables = ["CREATE TABLE IF NOT EXISTS heroku_25e074558aecc17.Stat
   "updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, " +
   "PRIMARY KEY (idUser), " +
   "UNIQUE INDEX username_UNIQUE (username ASC), " +
-  "UNIQUE INDEX phone_UNIQUE (phone ASC), " +
+  "UNIQUE INDEX email_UNIQUE (email ASC), " +
   "UNIQUE INDEX deviceToken_UNIQUE (deviceToken ASC)) " +
 "ENGINE = InnoDB;",
 
