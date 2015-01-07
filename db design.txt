@@ -1,0 +1,67 @@
+Database
+
+Express
+Passport Node (passport-local for local account logins/signups) - (passport-facebook, etc. for using other platform logins/registration)
+https://orchestrate.io/blog/2014/06/26/build-user-authentication-with-node-js-express-passport-and-orchestrate/
+bcrypt = require("bcryptjs")
+bcrypt.hashSync(password, 8) - generates 60 char hash
+
+node-jwt-simple - generate access token? ~150 char
+passport-http-bearer to authenticate token sent by client // don't need!
+moment.js - expiry date calculations
+
+http://www.sitepoint.com/using-json-web-tokens-node-js/
+{ "iss": 2, "exp": 130081947294710 }
+decode jwt into iss (user id) and exp (expiry date)
+
+passport-local?? should i just use my own framework to KISS
+
+User
+idUser
+majorUuid - required
+minorUuid - required
+username - required
+password - required
+phone (optional)
+status_id (phone number)
+timestamp
+
+Status
+status - (None, Pending, Accepted, Rejected [does not want future invites... to this group?], Deleted)
+
+Friend
+user_id (friend list of user)
+friend_id
+status_id
+timestamp
+
+ErrorCode
+code
+error - (Username taken, No such username [adding friend], Username is already in group)
+
+Group
+group_uuid
+user_id (group created by user)
+group_name
+
+many-to-many group-user relationship
+GroupUser
+group_id
+friend_id
+status_id
+timestamp
+
+
+user registration:
+hash password bcrypt.hashSync(password, 8);
+
+user authentication:
+
+
+https://addons.heroku.com/blowerio - 25 msg/month
+http://textbelt.com/ - 75 msg/day (not all carriers supported - wind), npm doesn't have canadian/intl
+SMS messaging
+
+to discuss:
+registration params (phone)
+cooldown on ping?

@@ -1,0 +1,21 @@
+{
+  "name": "doorbellApp",
+  "description": "Let your friends know you're at their door!",
+  "version": "0.0.1",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "private": true,
+  "dependencies": {
+    "async": "0.x",
+    "bcryptjs": "2.x",
+    "body-parser": "1.x",
+    "express": "4.x",
+    "jwt-simple": "0.x",
+    "moment": "2.8.x",
+    "mysql": "2.x",
+    "node-uuid": "1.x",
+    "parse": "1.x",
+    "random-seed": "0.x"
+  }
+}
