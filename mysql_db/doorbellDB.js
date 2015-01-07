@@ -4,7 +4,7 @@ module.exports.use = "USE heroku_25e074558aecc17;";
 module.exports.tables = ["CREATE TABLE IF NOT EXISTS heroku_25e074558aecc17.Status ( " +
   "idStatus INT NOT NULL AUTO_INCREMENT, " +
   "Status VARCHAR(45) NOT NULL, " +
-  "PRIMARY KEY (idStatus) " +
+  "PRIMARY KEY (idStatus)) " +
 "ENGINE = InnoDB;",
 
 "CREATE TABLE IF NOT EXISTS heroku_25e074558aecc17.User ( " +
