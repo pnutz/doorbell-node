@@ -66,7 +66,7 @@ module.exports.tables = ["CREATE TABLE IF NOT EXISTS heroku_25e074558aecc17.Stat
   "updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, " +
   "PRIMARY KEY (idGroup), " +
   "INDEX idUser_idx (idUser ASC), " +
-  "CONSTRAINT idUser " +
+  "CONSTRAINT idUser2 " +
     "FOREIGN KEY (idUser) " +
     "REFERENCES heroku_25e074558aecc17.User (idUser) " +
     "ON DELETE NO ACTION " +
@@ -82,19 +82,19 @@ module.exports.tables = ["CREATE TABLE IF NOT EXISTS heroku_25e074558aecc17.Stat
   "updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, " +
   "PRIMARY KEY (idGroupUser), " +
   "INDEX idGroup_idx (idUser ASC), " +
-  "INDEX idUser_idx (idReceivedUser ASC), " +
+  "INDEX idUser_idx (idUser ASC), " +
   "INDEX idStatus_idx (idStatus ASC), " +
   "CONSTRAINT idGroup " +
     "FOREIGN KEY (idGroup) " +
     "REFERENCES heroku_25e074558aecc17.Group (idGroup) " +
     "ON DELETE NO ACTION " +
     "ON UPDATE NO ACTION, " +
-  "CONSTRAINT idUser " +
+  "CONSTRAINT idUser3 " +
     "FOREIGN KEY (idUser) " +
     "REFERENCES heroku_25e074558aecc17.User (idUser) " +
     "ON DELETE NO ACTION " +
     "ON UPDATE NO ACTION, " +
-  "CONSTRAINT idStatus " +
+  "CONSTRAINT idStatus2 " +
     "FOREIGN KEY (idStatus) " +
     "REFERENCES heroku_25e074558aecc17.Status (idStatus) " +
     "ON DELETE NO ACTION " +
