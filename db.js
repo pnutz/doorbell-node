@@ -4,9 +4,9 @@ var script = require("./mysql_db/doorbellDB");
 
 var db_config = {
   host: "us-cdbr-iron-east-01.cleardb.net",
-  user: "baae06c4c30b89",
-  password: "9b5bfc63",
-  database: "heroku_06d5fed0deeebe4"
+  user: "b40e0fd1ab928a",
+  password: "3bacecd4",
+  database: "heroku_25e074558aecc17"
 };
 
 var connection;
