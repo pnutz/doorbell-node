@@ -15,8 +15,8 @@ exports.signUp = function(username, password, email, callback) {
   async.series([
     // check if username is in db
     function(seriesCallback) {
-      User.getUserByUsername(username, function(err, user) {
-        if (err) {
+      User.getUserByUsername(username, function(err, userResult) {
+        if (!userResult) {
           return seriesCallback();
         } else {
           return seriesCallback(new Error(global.errorcode["Username taken"]));
@@ -25,8 +25,8 @@ exports.signUp = function(username, password, email, callback) {
     },
     // check if email is in db
     function(seriesCallback) {
-      User.getUserByEmail(email, function(err, user) {
-        if (err) {
+      User.getUserByEmail(email, function(err, userResult) {
+        if (!userResult) {
           return seriesCallback();
         } else {
           return seriesCallback(new Error(global.errorcode["Email taken"]));
@@ -43,9 +43,9 @@ exports.signUp = function(username, password, email, callback) {
       async.whilst(
         function() { return flag != 0; },
         function(whilstCallback) {
-          User.getUserByUuid(majorUuid, minorUuid, function(err, user) {
+          User.getUserByUuid(majorUuid, minorUuid, function(err, userResult) {
             // no match, exit loop
-            if (err) {
+            if (!userResult) {
               flag = 0;
             } else if (flag == 1) {
               flag = 2;
@@ -75,10 +75,10 @@ exports.signUp = function(username, password, email, callback) {
       });
     }
   ], function(err, results) {
-    var token = generateToken(user);
     if (err) {
       return callback(err);
     } else {
+      var token = generateToken(user);
       return callback(null, user, token);
     }
   });
@@ -95,7 +95,7 @@ exports.logIn = function(username, password, callback) {
       User.getUserByUsername(username, function(err, userResult) {
         if (err) {
           return seriesCallback(new Error(global.errorcode["Username does not exist"]));
-        } else {bhn
+        } else {
           user = userResult;
           return seriesCallback();
         }
@@ -104,7 +104,7 @@ exports.logIn = function(username, password, callback) {
     // check if password matches
     function(seriesCallback) {
       if (bcrypt.compareSync(password, user.password)) {
-        token = generateToken();
+        token = generateToken(user);
         return seriesCallback();
       } else {
         return seriesCallback(new Error(global.errorcode["Incorrect password"]));
@@ -147,10 +147,10 @@ exports.authToken = function(username, token, callback) {
 
 // token expires in 7 days
 function generateToken(user) {
-  var expires = moment().add("days", 7).valueOf();
+  var expires = moment().add(7, "days").valueOf();
   var token = jwt.encode({
                             iss: user.id,
                             exp: expires
-                          }, app.get("jwtTokenSecret"));
+                          }, global.app.get("jwtTokenSecret"));
   return token;
 }

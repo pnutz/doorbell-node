@@ -17,26 +17,25 @@ var requestCount = 0;
 var port = "8888";
 
 function start() {
-  var app = express();
+  global.app = express();
 
-  app.set("jwtTokenSecret", "totallySeCuRe_FORreleaseC=");
-  app.use(bodyParser.json());
+  global.app.set("jwtTokenSecret", "totallySeCuRe_FORreleaseC=");
+  global.app.use(bodyParser.json());
   
   // use heroku's environment port (not assigned port)
-  var server = app.listen(process.env.PORT || port, function() {
-    console.log("Express Server Listening on Port %d in %s mode", server.address().port, app.settings.env);
+  var server = global.app.listen(process.env.PORT || port, function() {
+    console.log("Express Server Listening on Port %d in %s mode", server.address().port, global.app.settings.env);
   });
   
   console.log("Server Started");
   
-  app.get('/', function(req, res) {
+  global.app.get('/', function(req, res) {
     res.status(500).send("you messed up!");
   });
   
-  app.post('/register', function(req, res) {
+  global.app.post('/register', function(req, res) {
     incrementRequestCount();
     var params = req.body;
-    
     if (params.username != null && params.password != null && params.email != null) {
       auth.signUp(params.username, params.password, params.email, function(err, user, token) {
         if (err) {
@@ -58,7 +57,7 @@ function start() {
     }
   });
   
-  app.post('/devicetoken', function(req, res) {
+  global.app.post('/devicetoken', function(req, res) {
     incrementRequestCount();
     var params = req.body;
     var user;
@@ -97,7 +96,7 @@ function start() {
     }
   });
 
-  app.post('/login', function(req, res) {
+  global.app.post('/login', function(req, res) {
     incrementRequestCount();
     var params = req.body;
     
@@ -117,7 +116,7 @@ function start() {
     }
   });
 
-  app.post('/addfriend', function(req, res) {
+  global.app.post('/addfriend', function(req, res) {
     incrementRequestCount();
     var params = req.body;
     var user;
@@ -209,7 +208,7 @@ function start() {
     }
   });
 
-  app.post('/acceptfriend', function(req, res) {
+  global.app.post('/acceptfriend', function(req, res) {
     incrementRequestCount();
     var params = req.body;
     var user;
@@ -275,7 +274,7 @@ function start() {
     }
   });
 
-  app.post('/rejectfriend', function(req, res) {
+  global.app.post('/rejectfriend', function(req, res) {
     incrementRequestCount();
     var params = req.body;
     var user;
@@ -341,7 +340,7 @@ function start() {
     }
   });
 
-  app.post('/addgroup', function(req, res) {
+  global.app.post('/addgroup', function(req, res) {
     incrementRequestCount();
     var params = req.body;
     var user;
@@ -384,7 +383,7 @@ function start() {
     }
   });
 
-  app.post('/addmember', function(req, res) {
+  global.app.post('/addmember', function(req, res) {
     incrementRequestCount();
     var params = req.body;
     var user;
@@ -456,7 +455,7 @@ function start() {
     }
   });
 
-app.post('/deletemember', function(req, res) {
+global.app.post('/deletemember', function(req, res) {
     incrementRequestCount();
     var params = req.body;
     var user;
@@ -528,7 +527,7 @@ app.post('/deletemember', function(req, res) {
     }
   });
 
-  app.post('/acceptgroup', function(req, res) {
+  global.app.post('/acceptgroup', function(req, res) {
     incrementRequestCount();
     var params = req.body;
     var user;
@@ -594,7 +593,7 @@ app.post('/deletemember', function(req, res) {
     }
   });
 
-  app.post('/rejectgroup', function(req, res) {
+  global.app.post('/rejectgroup', function(req, res) {
     incrementRequestCount();
     var params = req.body;
     var user;
