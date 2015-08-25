@@ -101,7 +101,7 @@ function start() {
     var params = req.body;
     
     if (params.username != null && params.password != null) {
-      auth.logIn(username, password, function(err, token) {
+      auth.logIn(params.username, params.password, function(err, token) {
         if (err) {
           console.log("error: " + err.message);
           res.status(401).send({ error: err.message });

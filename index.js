@@ -65,7 +65,7 @@ async.series([
       // cache errorcodes to prevent db queries
       else if (result.length !== 0) {
         for (var i = 0; i < result.length; i++) {
-          global.errorcode[result[i].errorcode] = result[i].idErrorCode;
+          global.errorcode[result[i].Error] = result[i].idErrorCode;
         }
         return callback();
       }
