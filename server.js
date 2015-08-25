@@ -101,12 +101,16 @@ function start() {
     var params = req.body;
     
     if (params.username != null && params.password != null) {
-      auth.logIn(params.username, params.password, function(err, token) {
+      auth.logIn(params.username, params.password, function(err, user, token) {
         if (err) {
           console.log("error: " + err.message);
           res.status(401).send({ error: err.message });
         } else {
-          res.send({ token: token });
+          res.send({
+            majorUuid: user.majorUuid,
+            minorUuid: user.minorUuid,
+            token: token
+          });
         }
         decrementRequestCount();
       });

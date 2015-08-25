@@ -114,7 +114,7 @@ exports.logIn = function(username, password, callback) {
     if (err) {
       return callback(err);
     } else {
-      return callback(null, token);
+      return callback(null, user, token);
     }
   });
 };
