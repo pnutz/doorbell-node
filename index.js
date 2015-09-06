@@ -26,7 +26,7 @@ async.series([
       // cache statuses to prevent db queries
       else if (result.length !== 0) {
         for (var i = 0; i < result.length; i++) {
-          global.status[result[i].status] = result[i].idStatus;
+          global.status[result[i].Status] = result[i].idStatus;
         }
         return callback();
       }
