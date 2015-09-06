@@ -8,6 +8,6 @@ module.exports.errorCode = [
                               "Username taken",
                               "Email taken",
                               "Username does not exist",
-                              "Database insert error"
+                              "Database insert error",
                               "Push notification device token does not exist"
                             ];
