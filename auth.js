@@ -38,7 +38,8 @@ exports.signUp = function(username, password, email, callback) {
       var flag = 1;
       // random from 0 to 32767
       majorUuid = rand(32768);
-      minorUuid = rand(32768);
+      // random from 0 to 4095
+      minorUuid = rand(4096);
 
       async.whilst(
         function() { return flag != 0; },
@@ -52,7 +53,7 @@ exports.signUp = function(username, password, email, callback) {
               majorUuid = rand(32768);
             } else {
               flag = 1;
-              minorUuid = rand(32768);
+              minorUuid = rand(4096);
             }
             return whilstCallback();
           });

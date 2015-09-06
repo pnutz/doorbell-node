@@ -50,6 +50,12 @@ mysql_db/doorbellDB.js group code
 "ENGINE = InnoDB;"
 ------------------------
 
+mysql_db/dbInit.js group errorcodes
+------------------------
+"Group name is not unique",
+"Group already contains username",
+------------------------
+
 server.js group code
 ------------------------
   var Group = require("./model/group");

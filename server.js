@@ -9,6 +9,7 @@ var Init = require("./mysql_db/dbInit");
 var User = require("./model/user");
 var Friend = require("./model/friend");
 var auth = require("./auth");
+var push = require("./push");
 
 var requestCount = 0;
 var port = "8888";
@@ -122,6 +123,7 @@ function start() {
     var params = req.body;
     var user;
     var friend;
+    var response;
 
     if (params.username != null && params.token != null &&
         (params.friendUsername != null || friendMajor != null && friendMinor != null)) {
@@ -175,7 +177,6 @@ function start() {
           var newFriend = new Friend(user.id, friend.id, global.status["Pending"]);
           newFriend.save(function(id) {
             if (id != null) {
-              var response;
               // response for add friend by username
               if (params.friendUsername != null) {
                 response = {
@@ -187,14 +188,25 @@ function start() {
               else {
                 response = { username: friend.username };
               }
-              res.send(response);
-              // TODO: push notification for friend request
               return seriesCallback();
             } else {
               var err = new Error(global.errorcode["Database insert error"]);
               res.status(500).send({ error: err.message });
               return seriesCallback(err);
             }
+          });
+        },
+        // push notification to friend
+        function(seriesCallback) {
+          var pushMessage = "DOORKNOB! " + user.username + " has sent you a friend request.";
+          push.sendPushNotification(friend.deviceToken, pushMessage, function(err) {
+              if (err) {
+                res.status(500).send({ error: err.message });
+                return seriesCallback(err);
+              } else {
+                res.send(response);
+                return seriesCallback();
+              }
           });
         }
       ], function(err, results) {

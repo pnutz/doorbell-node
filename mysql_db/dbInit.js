@@ -8,7 +8,5 @@ module.exports.errorCode = [
                               "Username taken",
                               "Email taken",
                               "Username does not exist",
-                              "Group name is not unique",
-                              "Group already contains username",
                               "Database insert error"
                             ];
