@@ -199,15 +199,21 @@ function start() {
         // push notification to friend
         function(seriesCallback) {
           var pushMessage = "DOORKNOB! " + user.username + " has sent you a friend request.";
-          push.sendPushNotification(friend.deviceToken, pushMessage, function(err) {
-              if (err) {
-                res.status(500).send({ error: err.message });
-                return seriesCallback(err);
-              } else {
-                res.send(response);
-                return seriesCallback();
-              }
-          });
+          if (friend.deviceToken != null) {
+            push.sendPushNotification(friend.deviceToken, pushMessage, function(err) {
+                if (err) {
+                  res.status(500).send({ error: err.message });
+                  return seriesCallback(err);
+                } else {
+                  res.send(response);
+                  return seriesCallback();
+                }
+            });
+          } else {
+            var err = new Error(global.errorcode["Push notification device token does not exist"]);
+            res.status(500).send({ error: err.message });
+            return seriesCallback(err);
+          }
         }
       ], function(err, results) {
         if (err) {
