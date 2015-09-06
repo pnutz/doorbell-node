@@ -45,7 +45,7 @@ function insertErrorCode(post, callback) {
 }
 
 function updateErrorCode(id, post, callback) {
-  var query = db.query("UPDATE errorcode SET ? WHERE id = ?", [post, id], function(err, result) {
+  var query = db.query("UPDATE errorcode SET ? WHERE idErrorCode = ?", [post, id], function(err, result) {
     if (err) {
       console.log(err.Message);
       db.rollback(function() {

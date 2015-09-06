@@ -45,7 +45,7 @@ function insertStatus(post, callback) {
 }
 
 function updateStatus(id, post, callback) {
-  var query = db.query("UPDATE status SET ? WHERE id = ?", [post, id], function(err, result) {
+  var query = db.query("UPDATE status SET ? WHERE idStatus = ?", [post, id], function(err, result) {
     if (err) {
       console.log(err.Message);
       db.rollback(function() {

@@ -62,7 +62,7 @@ function insertUser(post, callback) {
 }
 
 function updateUser(id, post, callback) {
-  var query = db.query("UPDATE user SET ? WHERE id = ?", [post, id], function(err, result) {
+  var query = db.query("UPDATE user SET ? WHERE idUser = ?", [post, id], function(err, result) {
     if (err) {
       console.log(err.message);
       db.rollback(function() {

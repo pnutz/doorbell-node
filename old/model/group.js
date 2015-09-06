@@ -59,7 +59,7 @@ function insertGroup(post, callback) {
 }
 
 function updateGroup(id, post, callback) {
-  var query = db.query("UPDATE group SET ? WHERE id = ?", [post, id], function(err, result) {
+  var query = db.query("UPDATE group SET ? WHERE idGroup = ?", [post, id], function(err, result) {
     if (err) {
       console.log(err.message);
       db.rollback(function() {
