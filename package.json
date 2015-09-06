@@ -14,7 +14,6 @@
     "jwt-simple": "0.x",
     "moment": "2.8.x",
     "mysql": "2.x",
-    "node-uuid": "1.x",
     "parse": "1.x",
     "random-seed": "0.x"
   }

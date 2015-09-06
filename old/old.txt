@@ -1,0 +1,378 @@
+package.json group dependency
+------------------------
+"node-uuid": "1.x",
+------------------------
+
+mysql_db/doorbellDB.js group code
+------------------------
+"CREATE TABLE IF NOT EXISTS heroku_25e074558aecc17.Group ( " +
+  "idGroup INT NOT NULL AUTO_INCREMENT, " +
+  "idUser INT NOT NULL, " +
+  "groupName VARCHAR(45) NOT NULL, " +
+  "uuid VARCHAR(32) NOT NULL, " +
+  "createdAt TIMESTAMP NOT NULL DEFAULT 0, " +
+  "updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, " +
+  "PRIMARY KEY (idGroup), " +
+  "INDEX idUser_idx (idUser ASC), " +
+  "CONSTRAINT idUser2 " +
+    "FOREIGN KEY (idUser) " +
+    "REFERENCES heroku_25e074558aecc17.User (idUser) " +
+    "ON DELETE NO ACTION " +
+    "ON UPDATE NO ACTION) " +
+"ENGINE = InnoDB;",
+
+"CREATE TABLE IF NOT EXISTS heroku_25e074558aecc17.GroupUser ( " +
+  "idGroupUser INT NOT NULL AUTO_INCREMENT, " +
+  "idGroup INT NOT NULL, " +
+  "idUser INT NOT NULL, " +
+  "idStatus INT NOT NULL, " +
+  "createdAt TIMESTAMP NOT NULL DEFAULT 0, " +
+  "updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, " +
+  "PRIMARY KEY (idGroupUser), " +
+  "INDEX idGroup_idx (idUser ASC), " +
+  "INDEX idUser_idx (idUser ASC), " +
+  "INDEX idStatus_idx (idStatus ASC), " +
+  "CONSTRAINT idGroup " +
+    "FOREIGN KEY (idGroup) " +
+    "REFERENCES heroku_25e074558aecc17.Group (idGroup) " +
+    "ON DELETE NO ACTION " +
+    "ON UPDATE NO ACTION, " +
+  "CONSTRAINT idUser3 " +
+    "FOREIGN KEY (idUser) " +
+    "REFERENCES heroku_25e074558aecc17.User (idUser) " +
+    "ON DELETE NO ACTION " +
+    "ON UPDATE NO ACTION, " +
+  "CONSTRAINT idStatus2 " +
+    "FOREIGN KEY (idStatus) " +
+    "REFERENCES heroku_25e074558aecc17.Status (idStatus) " +
+    "ON DELETE NO ACTION " +
+    "ON UPDATE NO ACTION) " +
+"ENGINE = InnoDB;"
+------------------------
+
+server.js group code
+------------------------
+  var Group = require("./model/group");
+  var GroupUser = require("./model/groupuser");
+
+  var mware = require("./mware");
+  
+  global.app.post('/addgroup', function(req, res) {
+    incrementRequestCount();
+    var params = req.body;
+    var user;
+
+    if (params.username != null && params.token != null && params.groupName != null) {
+      async.series([
+        // authorize token
+        function(seriesCallback) {
+          auth.authToken(params.username, params.token, function(err, returnedUser) {
+            if (err) {
+              res.status(401).send({ error: err.message });
+              return seriesCallback(err);
+            } else {
+              user = returnedUser;
+              return seriesCallback();
+            }
+          });
+        },
+        // add group
+        function(seriesCallback) {
+          mware.createGroup(user, params.groupName, params.members, function(err, results) {
+            if (err) {
+              res.status(500).send({ error: err.message });
+              return seriesCallback(err);
+            } else {
+              res.send(results);
+              return seriesCallback();
+            }
+          });
+        }
+      ], function(err, results) {
+        if (err) {
+          console.log("error: " + err.message);
+        }
+        decrementRequestCount();
+      });
+    } else {
+      console.log("invalid parameters for addgroup route");
+      decrementRequestCount();
+    }
+  });
+
+  global.app.post('/addmember', function(req, res) {
+    incrementRequestCount();
+    var params = req.body;
+    var user;
+    var group;
+    var results = {};
+
+    if (params.username != null && params.token != null
+        && params.groupName != null && params.members != null && params.members > 0) {
+      async.series([
+        // authorize token
+        function(seriesCallback) {
+          auth.authToken(params.username, params.token, function(err, returnedUser) {
+            if (err) {
+              res.status(401).send({ error: err.message });
+              return seriesCallback(err);
+            } else {
+              user = returnedUser;
+              return seriesCallback();
+            }
+          });
+        },
+        // get group
+        function(seriesCallback) {
+          Group.getGroupByGroupName(user.id, params.groupName, function(err, returnedGroup) {
+            if (err) {
+              res.status(500).send({ error: err.message });
+              return seriesCallback(err);
+            } else {
+              group = returnedGroup;
+              return seriesCallback();
+            }
+          });
+        },
+        // add members
+        function(seriesCallback) {
+          async.eachSeries(params.members, function(member, eachCallback) {
+            mware.addMember(group.id, member, function(err) {
+              if (err) {
+                if (!results.hasOwnProperty("members")) {
+                  results.members = [];
+                }
+                var memberErr = { username: member, error: err.message };
+                results.members.push(memberErr);
+              }
+              return eachCallback();
+            });
+          }, function(err) {
+            if (err) {
+              return seriesCallback(err);
+            } else {
+              return seriesCallback();
+            }
+          });
+        }
+      ], function(err, results) {
+        if (err) {
+          console.log("error: " + err.message);
+        } else {
+          if (!results.hasOwnProperty("members")) {
+            results.success = true;
+          }
+          res.send(results);
+        }
+        decrementRequestCount();
+      });
+    } else {
+      console.log("invalid parameters for addmember route");
+      decrementRequestCount();
+    }
+  });
+
+  global.app.post('/deletemember', function(req, res) {
+    incrementRequestCount();
+    var params = req.body;
+    var user;
+    var group;
+    var results = {};
+
+    if (params.username != null && params.token != null && params.groupName != null
+          && params.members != null && params.members.length > 0) {
+      async.series([
+        // authorize token
+        function(seriesCallback) {
+          auth.authToken(params.username, params.token, function(err, returnedUser) {
+            if (err) {
+              res.status(401).send({ error: err.message });
+              return seriesCallback(err);
+            } else {
+              user = returnedUser;
+              return seriesCallback();
+            }
+          });
+        },
+        // get group
+        function(seriesCallback) {
+          Group.getGroupByGroupName(user.id, params.groupName, function(err, returnedGroup) {
+            if (err) {
+              res.status(500).send({ error: err.message });
+              return seriesCallback(err);
+            } else {
+              group = returnedGroup;
+              return seriesCallback();
+            }
+          });
+        },
+        // delete members
+        function(seriesCallback) {
+          async.eachSeries(params.members, function(member, eachCallback) {
+            mware.deleteMember(group.id, member, function(err) {
+              if (err) {
+                if (!results.hasOwnProperty("members")) {
+                  results.members = [];
+                }
+                var memberErr = { username: member, error: err.message };
+                results.members.push(memberErr);
+              }
+              return eachCallback();
+            })
+          }, function(err) {
+            if (err) {
+              return seriesCallback(err);
+            } else {
+              return seriesCallback();
+            }
+          });
+        }
+      ], function(err, results) {
+        if (err) {
+          console.log("error: " + err.message);
+        } else {
+          if (!results.hasOwnProperty("members")) {
+            results.success = true;
+          }
+          res.send(results);
+        }
+        decrementRequestCount();
+      });
+    } else {
+      console.log("invalid parameters for deletemember route");
+      decrementRequestCount();
+    }
+  });
+
+  global.app.post('/acceptgroup', function(req, res) {
+    incrementRequestCount();
+    var params = req.body;
+    var user;
+    var group;
+    var groupuser;
+    var results = {};
+
+    if (params.username != null && params.token != null && params.uuid != null) {
+      async.series([
+        // authorize token
+        function(seriesCallback) {
+          auth.authToken(params.username, params.token, function(err, returnedUser) {
+            if (err) {
+              res.status(401).send({ error: err.message });
+              return seriesCallback(err);
+            } else {
+              user = returnedUser;
+              return seriesCallback();
+            }
+          });
+        },
+        // get group
+        function(seriesCallback) {
+          Group.getGroupByUuid(uuid, function(err, returnedGroup) {
+            if (err) {
+              res.status(500).send({ error: err.message });
+              return seriesCallback(err);
+            } else {
+              group = returnedGroup;
+              return seriesCallback();
+            }
+          });
+        },
+        // get groupuser
+        function(seriesCallback) {
+          GroupUser.getGroupUserById(group.id, user.id, function(err, returnedGroupuser) {
+            if (err) {
+              res.status(500).send({ error: err.message });
+              return seriesCallback(err);
+            } else {
+              groupuser = returnedGroupuser;
+              return seriesCallback();
+            }
+          });
+        },
+        // update groupuser status
+        function(seriesCallback) {
+          groupuser.idStatus = global.status["Accepted"];
+          groupuser.save(function() {
+            res.send({ success: true });
+            return seriesCallback();
+          });
+        }
+      ], function(err, results) {
+        if (err) {
+          console.log("error: " + err.message);
+        }
+        decrementRequestCount();
+      });
+    } else {
+      console.log("invalid parameters for acceptgroup route");
+      decrementRequestCount();
+    }
+  });
+
+  global.app.post('/rejectgroup', function(req, res) {
+    incrementRequestCount();
+    var params = req.body;
+    var user;
+    var group;
+    var groupuser;
+    var results = {};
+
+    if (params.username != null && params.token != null && params.uuid != null) {
+      async.series([
+        // authorize token
+        function(seriesCallback) {
+          auth.authToken(params.username, params.token, function(err, returnedUser) {
+            if (err) {
+              res.status(401).send({ error: err.message });
+              return seriesCallback(err);
+            } else {
+              user = returnedUser;
+              return seriesCallback();
+            }
+          });
+        },
+        // get group
+        function(seriesCallback) {
+          Group.getGroupByUuid(uuid, function(err, returnedGroup) {
+            if (err) {
+              res.status(500).send({ error: err.message });
+              return seriesCallback(err);
+            } else {
+              group = returnedGroup;
+              return seriesCallback();
+            }
+          });
+        },
+        // get groupuser
+        function(seriesCallback) {
+          GroupUser.getGroupUserById(group.id, user.id, function(err, returnedGroupuser) {
+            if (err) {
+              res.status(500).send({ error: err.message });
+              return seriesCallback(err);
+            } else {
+              groupuser = returnedGroupuser;
+              return seriesCallback();
+            }
+          });
+        },
+        // update groupuser status
+        function(seriesCallback) {
+          groupuser.idStatus = global.status["Rejected"];
+          groupuser.save(function() {
+            res.send({ success: true });
+            return seriesCallback();
+          });
+        }
+      ], function(err, results) {
+        if (err) {
+          console.log("error: " + err.message);
+        }
+        decrementRequestCount();
+      });
+    } else {
+      console.log("invalid parameters for rejectgroup route");
+      decrementRequestCount();
+    }
+  });
+------------------------
