@@ -198,9 +198,11 @@ function start() {
         },
         // push notification to friend
         function(seriesCallback) {
-          var pushMessage = "DOORKNOB! " + user.username + " has sent you a friend request.";
           if (friend.deviceToken != null) {
-            push.sendPushNotification(friend.deviceToken, pushMessage, function(err) {
+            var pushData = {
+              "alert": "DOORKNOB! " + user.username + " has sent you a friend request."
+            };
+            push.sendPushNotification(friend.deviceToken, pushData, function(err) {
                 if (err) {
                   res.status(500).send({ error: err.message });
                   return seriesCallback(err);
