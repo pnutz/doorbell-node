@@ -4,7 +4,7 @@ var url = require("url");
 var async = require("async");
 var express = require("express");
 var bodyParser = require("body-parser");
-var debug = require("debug")("server.js");
+var debug = require("debug")("server");
 
 var Init = require("./mysql_db/dbInit");
 var User = require("./model/user");
@@ -23,10 +23,10 @@ function start() {
   
   // use heroku's environment port (not assigned port)
   var server = global.app.listen(process.env.PORT || port, function() {
-    debug("Express Server Listening on Port %d in %s mode", server.address().port, global.app.settings.env);
+    console.log("Express Server Listening on Port %d in %s mode", server.address().port, global.app.settings.env);
   });
   
-  debug("Server Started");
+  console.log("Server Started");
   
   global.app.get('/', function(req, res) {
     res.status(500).send("you messed up!");
