@@ -23,10 +23,10 @@ function start() {
   
   // use heroku's environment port (not assigned port)
   var server = global.app.listen(process.env.PORT || port, function() {
-    console.log("Express Server Listening on Port %d in %s mode", server.address().port, global.app.settings.env);
+    debug("Express Server Listening on Port %d in %s mode", server.address().port, global.app.settings.env);
   });
   
-  console.log("Server Started");
+  debug("Server Started");
   
   global.app.get('/', function(req, res) {
     res.status(500).send("you messed up!");
@@ -365,7 +365,7 @@ function start() {
 
 function incrementRequestCount() {
   requestCount++;
-  console.log("Concurrent Requests: " + requestCount);
+  debug("Concurrent Requests: " + requestCount);
 }
 
 function decrementRequestCount() { requestCount--; }
