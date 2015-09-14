@@ -12,6 +12,8 @@ exports.sendPushNotification = function(deviceToken, data, callback) {
   query.equalTo("deviceToken", deviceToken);
   query.equalTo("deviceType", "ios");
 
+  data["category"] = "category_action_accept_friend";
+  
   console.log(query);
 
   Parse.Push.send({

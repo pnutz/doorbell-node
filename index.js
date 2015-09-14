@@ -1,6 +1,7 @@
 var server = require("./server");
 var mysql = require("./db");
 var async = require("async");
+var debug = require("debug")("debug");
 
 var Init = require("./mysql_db/dbInit");
 var Status = require("./model/status");
