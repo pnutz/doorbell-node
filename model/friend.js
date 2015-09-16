@@ -34,8 +34,8 @@ Friend.prototype.save = function(callback) {
     post.createdAt = null;
     post.updatedAt = null;
     
-    insertFriend(post, function(id) {
-      return callback(id);
+    insertFriend(post, function(err, id) {
+      return callback(err, id);
     });
   } else {
     updateFriend(local.idUser, local.idFriend, post, callback);
@@ -52,7 +52,7 @@ function insertFriend(post, callback) {
       return callback(null);
     } else {
       console.log("Inserted ID " + result.insertId + " into Friend");
-      return callback(result.insertId);
+      return callback(err, result.insertId);
     }
   });
   console.log(query.sql);
@@ -70,6 +70,22 @@ function updateFriend(idUser, idFriend, post, callback) {
       console.log("Updated Friend with idUser: " + idUser + " and idFriend: " + idFriend);
     }
     return callback();
+  });
+  console.log(query.sql);
+}
+
+function deleteFriend(idUser, idFriend, post, callback) {
+  var query = db.query("DELETE FROM friend WHERE idUser = ? AND idFriendUser = ?",
+    [idUser, idFriend], function(err, result) {
+    if (err) {
+      console.log(err.message);
+      db.rollback(function() {
+        throw err;
+      });
+    } else {
+      console.log("Deleted Friend with idUser: " + idUser + " and idFriend: " + idFriend);
+    }
+    return callback(null);
   });
   console.log(query.sql);
 }
@@ -138,8 +154,8 @@ Friend.getFriendById = function(idUser, idFriend, callback) {
   });
 };
 
-Friend.getFriendsByUser = function(idUser, callback) {
-  Access.selectByColumn("friend", "idUser", idUser, "", function(result) {
+Friend.getFriendsByUser = function(oUser, callback) {
+  Access.selectByColumn("friend", "idUser", oUser.id, "", function(err, result) {
     if (result != null) {
       var friends = [];
       for (var i = 0; i < result.length; i++) {
@@ -149,13 +165,13 @@ Friend.getFriendsByUser = function(idUser, callback) {
       }
       return callback(null, friends);
     } else {
-      return callback(new Error("No Friends for idUser " + idUser));
+      return callback(new Error("No Friends for idUser " + oUser.id));
     }
   });
 };
 
 Friend.getFriendsByFriendUser = function(idFriend, callback) {
-  Access.selectByColumn("friend", "idFriendUser", idFriend, "", function(result) {
+  Access.selectByColumn("friend", "idFriendUser", idFriend, "", function(err, result) {
     if (result != null) {
       var friends = [];
       for (var i = 0; i < result.length; i++) {

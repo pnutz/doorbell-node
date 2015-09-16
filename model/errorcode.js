@@ -60,7 +60,7 @@ function updateErrorCode(id, post, callback) {
 }
 
 ErrorCode.getErrorCodeById = function(id, callback) {
-  Access.selectByColumn("errorcode", "idErrorCode", id, "", function(result) {
+  Access.selectByColumn("errorcode", "idErrorCode", id, "", function(err, result) {
     if (result != null) {
       var error = new ErrorCode(result[0].idErrorCode, result[0].error);
       return callback(null, error);

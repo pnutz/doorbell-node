@@ -121,28 +121,45 @@ exports.logIn = function(username, password, callback) {
 };
 
 // token authentication route
-exports.authToken = function(username, token, callback) {
+/**
+ * @brief Authenticates a user token
+ * @params sUsername name of user to search for
+ * @params sToken token string
+ * @params fnCallback callback 
+ * @returns User object through fnCallback
+ */
+exports.authToken = function(sUsername, sToken, fnCallback) {
+  // Verify input
+  if (sUsername == null || sToken == null)
+      return fnCallback(new Error("Invalid username/token"));
+
   try {
-    var decoded = jwt.decode(token, app.get("jwtTokenSecret"));
+    var decoded = jwt.decode(sToken, app.get("jwtTokenSecret"));
 
     if (decoded.exp <= Date.now()) {
-      return callback(new Error(global.errorcode["Expired token"]));
+      return fnCallback(new Error(global.errorcode["Expired token"]));
     }
 
-    User.getUserByUsername(username, function(err, user) {
+    // Fetch user object
+    User.getUserByUsername(sUsername, function(err, oRetrievedUser) {
       if (err) {
-        return callback(new Error(global.errorcode["Username does not exist"]));
-      } else {
-        if (user.id == decoded.iss) {
-          return callback(null, user);
-        } else {
-          return callback(new Error(global.errorcode["Token does not match user"]));
-        }
+        return fnCallback(err);
       }
+
+      if (oRetrievedUser == null) {
+        return fnCallback(new Error(global.errorcode["Username does not exist"]));
+      }
+      
+      if (oRetrievedUser.id != decoded.iss) {
+        return fnCallback(new Error(global.errorcode["Token does not match user"]));
+      }
+
+      // Success
+      return fnCallback(err, oRetrievedUser);
     });
 
   } catch (err) {
-    return callback(new Error(global.errorcode["Invalid token"]));
+    return fnCallback(new Error(global.errorcode["Invalid token"]));
   }
 };
 

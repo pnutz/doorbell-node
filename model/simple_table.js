@@ -16,7 +16,7 @@ function selectByColumn(table, column, id, queryadd, callback) {
     }
 
     if (rows.length !== 0) {
-      return callback(rows);
+      return callback(err, rows);
     }
     else {
       console.log("No rows selected");
@@ -89,15 +89,15 @@ function save(table, column, value, callback) {
               console.log(err.message);
             }
           });
-          return callback(null);
+          return callback(err);
         } else {
           console.log("Inserted ID " + result.insertId + " into " + table);
-          return callback(result.insertId);
+          return callback(err, result.insertId);
         }
       });
       console.log(query.sql);
     } else {
-      return callback(resultId);
+      return callback(err, resultId);
     }
   });
 };

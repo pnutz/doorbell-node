@@ -3,7 +3,7 @@
   "description": "Let your friends know you're at their door!",
   "version": "0.0.1",
   "scripts": {
-    "start": "node index.js",
+    "start": "node index.js"
     "debug": "node debug index.js"
   },
   "private": true,
@@ -16,7 +16,11 @@
     "jwt-simple": "0.x",
     "moment": "2.8.x",
     "mysql": "2.x",
+    "node-uuid": "1.x",
     "parse": "1.x",
     "random-seed": "0.x"
+  },
+  "devDependencies": {
+    "frisby": "^0.8.5"
   }
 }

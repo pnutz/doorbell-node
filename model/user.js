@@ -77,7 +77,7 @@ function updateUser(id, post, callback) {
 }
 
 User.getUserById = function(id, callback) {
-  Access.selectByColumn("user", "idUser", id, "", function(result) {
+  Access.selectByColumn("user", "idUser", id, "", function(err, result) {
     if (result != null) {
       var user = new User(result[0].idUser, result[0].username,
         result[0].password, result[0].majorUuid,
@@ -91,7 +91,10 @@ User.getUserById = function(id, callback) {
 };
 
 User.getUserByUsername = function(username, callback) {
-  Access.selectByColumn("user", "username", username, "", function(result) {
+  Access.selectByColumn("user", "username", username, "", function(err, result) {
+    if (err) {
+      return callback(new Error("Error looking for user" + username));
+    }
     if (result != null) {
       var user = new User(result[0].idUser, result[0].username,
         result[0].password, result[0].majorUuid,
@@ -105,7 +108,7 @@ User.getUserByUsername = function(username, callback) {
 };
 
 User.getUserByEmail = function(email, callback) {
-  Access.selectByColumn("user", "email", email, "", function(result) {
+  Access.selectByColumn("user", "email", email, "", function(err, result) {
     if (result != null) {
       var user = new User(result[0].idUser, result[0].username,
         result[0].password, result[0].majorUuid,

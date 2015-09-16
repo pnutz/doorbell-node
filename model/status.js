@@ -60,7 +60,7 @@ function updateStatus(id, post, callback) {
 }
 
 Status.getStatusById = function(id, callback) {
-  Access.selectByColumn("status", "idStatus", id, "", function(result) {
+  Access.selectByColumn("status", "idStatus", id, "", function(err, result) {
     if (result != null) {
       var status = new Status(result[0].idStatus, result[0].status);
       return callback(null, status);

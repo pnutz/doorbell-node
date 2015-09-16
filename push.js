@@ -7,6 +7,12 @@ Parse.initialize(
 );
 
 exports.sendPushNotification = function(deviceToken, data, callback) {
+  // Don't go any further if token is null
+  if (deviceToken == null) {
+    var err = new Error(global.errorcode["Push notification device token does not exist"]);
+    return callback(err);
+  }
+
   var query = new Parse.Query(Parse.Installation);
   
   query.equalTo("deviceToken", deviceToken);
@@ -22,7 +28,7 @@ exports.sendPushNotification = function(deviceToken, data, callback) {
   }, {
     success: function() {
       console.log("Sent push notification");
-      return callback();
+      return callback(null);
     },
     error: function(error) {
       return callback(new Error(error.code + " " + error.message));

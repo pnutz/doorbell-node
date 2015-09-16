@@ -15,6 +15,26 @@ var push = require("./push");
 var requestCount = 0;
 var port = "8888";
 
+function HandleResponse(res, err, results) {
+  if (err) {
+    console.log("error: " + err.message);
+    res.status(500).send({ error: err.message });
+  } else {
+    res.send(results);
+  }
+  decrementRequestCount();
+}
+
+function SendError(err, res)
+{
+  if (err) {
+    console.log("error: " + err.message);
+    res.status(500).send({ error: err.message });
+    decrementRequestCount();
+  }
+}
+
+
 function start() {
   global.app = express();
 
@@ -35,8 +55,9 @@ function start() {
   global.app.post('/register', function(req, res) {
     incrementRequestCount();
     var params = req.body;
-    if (params.username != null && params.password != null && params.email != null) {
-      auth.signUp(params.username, params.password, params.email, function(err, user, token) {
+    var headers = req.headers;
+    if (headers.username != null && headers.password != null && params.email != null) {
+      auth.signUp(headers.username, headers.password, params.email, function(err, user, token) {
         if (err) {
           console.log("error: " + err.message);
           res.status(500).send({ error: err.message });
@@ -98,9 +119,9 @@ function start() {
   global.app.post('/login', function(req, res) {
     incrementRequestCount();
     var params = req.body;
-    
-    if (params.username != null && params.password != null) {
-      auth.logIn(params.username, params.password, function(err, user, token) {
+    var headers = req.headers;
+    if (headers.username != null && headers.password != null) {
+      auth.logIn(headers.username, headers.password, function(err, user, token) {
         if (err) {
           console.log("error: " + err.message);
           res.status(401).send({ error: err.message });
@@ -119,247 +140,163 @@ function start() {
     }
   });
 
-  global.app.post('/addfriend', function(req, res) {
-    incrementRequestCount();
-    var params = req.body;
-    var user;
-    var friend;
-    var response;
+  function AddFriend(statusCode, oUser, oFriendUser, callback)
+  {
+    console.log("adding" + statusCode + " " + oUser.id + " " + oFriendUser.id);
+    var newFriend = new Friend(oUser.id, oFriendUser.id, statusCode);
+    newFriend.save(function(err, id) {
+      var response = null;
+      console.log("hey");
+      if (!err) {
+        console.log("Returning majoruuid " + oFriendUser.majorUuid );
+        response = {
+          friendMajor: oFriendUser.majorUuid,
+          friendMinor: oFriendUser.minorUuid,
+          username: oFriendUser.username
+        };
+      } 
+      return callback(err, response);
+    });
+  }
 
-    if (params.username != null && params.token != null &&
-        (params.friendUsername != null || friendMajor != null && friendMinor != null)) {
-      async.series([
-        // authorize token
-        function(seriesCallback) {
-          auth.authToken(params.username, params.token, function(err, returnedUser) {
-            if (err) {
-              res.status(401).send({ error: err.message });
-              return seriesCallback(err);
-            } else {
-              user = returnedUser;
-              return seriesCallback();
-            }
-          });
-        },
-        // get friend by username
-        function(seriesCallback) {
-          if (params.friendUsername != null) {
-            User.getUserByUsername(params.friendUsername, function(err, user) {
-              if (err) {
-                res.status(500).send({ error: err.message });
-                return seriesCallback(err);
-              } else {
-                friend = user;
-                return seriesCallback();
-              }
-            });
-          } else {
-            return seriesCallback();
-          }
-        },
-        // get friend by bluetooth sync
-        function(seriesCallback) {
-          if (friend == null) {
-            User.getUserByUuid(params.friendMajor, params.friendMinor, function(err, user) {
-              if (err) {
-                res.status(500).send({ error: err.message });
-                return seriesCallback(err);
-              } else {
-                friend = user;
-                return seriesCallback();
-              }
-            });
-          } else {
-            return seriesCallback();
-          }
-        },
-        // add friend
-        function(seriesCallback) {
-          var newFriend = new Friend(user.id, friend.id, global.status["Pending"]);
-          newFriend.save(function(id) {
-            if (id != null) {
-              // response for add friend by username
-              if (params.friendUsername != null) {
-                response = {
-                  friendMajor: friend.majorUuid,
-                  friendMinor: friend.minorUuid
-                };
-              }
-              // response for add friend by bluetooth
-              else {
-                response = { username: friend.username };
-              }
-              return seriesCallback();
-            } else {
-              var err = new Error(global.errorcode["Database insert error"]);
-              res.status(500).send({ error: err.message });
-              return seriesCallback(err);
-            }
-          });
-        },
-        // push notification to friend
-        function(seriesCallback) {
-          if (friend.deviceToken != null) {
-            var pushData = {
-              "alert": "DOORKNOB! " + user.username + " has sent you a friend request."
-            };
-            push.sendPushNotification(friend.deviceToken, pushData, function(err) {
-                if (err) {
-                  res.status(500).send({ error: err.message });
-                  return seriesCallback(err);
-                } else {
-                  res.send(response);
-                  return seriesCallback();
-                }
-            });
-          } else {
-            var err = new Error(global.errorcode["Push notification device token does not exist"]);
-            res.status(500).send({ error: err.message });
-            return seriesCallback(err);
-          }
-        }
-      ], function(err, results) {
-        if (err) {
-          console.log("error: " + err.message);
-        }
-        decrementRequestCount();
-      });
-    } else {
-      console.log("invalid parameters for addfriend route");
-      decrementRequestCount();
-    }
+  // FIXME: this should be moved to JUST below the route handler for login
+  // Catch all for authentication required requests
+  global.app.all('*', function AuthenticateUser(req, res, next) {
+    auth.authToken(req.headers.username, req.headers.token, function(err, oUser) {
+      if (err) {
+        console.log("Error authenticating");
+        // If error then authentication failed
+        res.status(401).send();
+      } else {
+        console.log("retrieved username " + oUser.username);
+        req.oUser = oUser;
+        incrementRequestCount();
+        next();
+      }
+    });
   });
 
-  global.app.post('/acceptfriend', function(req, res) {
-    incrementRequestCount();
-    var params = req.body;
-    var user;
-    var friendUser;
-    var friend;
-    var results = {};
-
-    if (params.username != null && params.token != null && params.friendUsername != null) {
-      async.series([
-        // authorize token
-        function(seriesCallback) {
-          auth.authToken(params.username, params.token, function(err, returnedUser) {
-            if (err) {
-              res.status(401).send({ error: err.message });
-              return seriesCallback(err);
-            } else {
-              user = returnedUser;
-              return seriesCallback();
-            }
-          });
-        },
-        // get friend user
-        function(seriesCallback) {
-          User.getUserByUsername(params.friendUsername, function(err, returnedUser) {
-            if (err) {
-              res.status(500).send({ error: err.message });
-              return seriesCallback(err);
-            } else {
-              friendUser = returnedUser;
-              return seriesCallback();
-            }
-          });
-        },
-        // get friend
-        function(seriesCallback) {
-          Friend.getFriendById(friend.id, user.id, function(err, returnedFriend) {
-            if (err) {
-              res.status(500).send({ error: err.message });
-              return seriesCallback(err);
-            } else {
-              friend = returnedFriend;
-              return seriesCallback();
-            }
-          });
-        },
-        // update friend status
-        function(seriesCallback) {
-          friend.idStatus = global.status["Accepted"];
-          friend.save(function() {
-            res.send({ success: true });
-            return seriesCallback();
-          });
-        }
-      ], function(err, results) {
+  global.app.get('/user/:majorUuid/:minorUuid', function(req, res) {
+    console.log("finding user by uuid");
+    User.getUserByUuid(
+      req.params.majorUuid, 
+      req.params.minorUuid, 
+      function(err, results) {
         if (err) {
-          console.log("error: " + err.message);
+          res.status(500).send({error : err.message});
+        } else {
+          console.log(results);
+          res.send(results);
         }
-        decrementRequestCount();
       });
-    } else {
-      console.log("invalid parameters for acceptfriend route");
-      decrementRequestCount();
-    }
   });
 
-  global.app.post('/rejectfriend', function(req, res) {
+  // FIXME: This should be modified accordingly to allow for filtering
+  // currently this function is hacked for testing as I have no way of getting
+  // major minor uuids
+  global.app.get('/user', function(req, res) {
+    console.log("finding user by username" + req.query.username);
+    User.getUserByUsername(
+      req.query.username, 
+      function(err, results) {
+        if (err) {
+          res.status(500).send({error : err.message});
+        } else {
+          console.log(results);
+          res.send(results);
+        }
+      });
+  });
+
+  global.app.get('/friend', function(req, res) {
+    console.log("listing friends");
+    Friend.getFriendsByUser(
+      req.oUser, 
+      function(err, results) {
+        if (err) {
+          res.status(500).send({error : err.message});
+        } else {
+          console.log(results);
+          res.send(results);
+        }
+      });
+  });
+
+  
+  global.app.delete('/friend/:majorUuid/:minorUuid', function(req, res) {
+    console.log("Deleting friends");
+    async.waterfall([
+      async.apply(User.getUserByUuid, req.params.majorUuid, req.params.minorUuid),
+      async.apply(Friend.deleteFriend, req.oUser) 
+    ], function(err, results) {
+        if (err) {
+          res.status(500).send({error : err.message});
+        } else {
+          console.log(results);
+          res.send(results);
+        }
+      });
+  });
+
+  global.app.post('/friend/:majorUuid/:minorUuid', function(req, res) {
+    // Find friend
+    User.getUserByUuid(req.params.majorUuid, req.params.minorUuid, function(err, oFriendUser) { 
+      if (err) {
+        return SendError(res, err);
+      }
+      // Determine which function to call based on params we received
+      async.series([
+        // Returns map of response
+        async.apply(AddFriend, global.status["Pending"], req.oUser, oFriendUser),
+        // Send push
+        function (callback) {
+          console.log("sending push");
+          var pushData = {
+            "alert": "DOORKNOB! " + req.oUser.username + " has sent you a friend request."
+          };
+          push.sendPushNotification(oFriendUser.deviceToken, pushData, function(err) {
+            if (err) { console.log("Push notification failed");}
+          });
+
+          // Don't care if it fails
+          callback();
+        }
+      ], // Main callback
+      function (err, response) {
+        // Return response based on the success of the add friend call
+          console.log("sending response " + response);
+        HandleResponse(res, err, response[0]);
+      });
+
+    });
+  });
+
+  global.app.put('/friend/accept?reject', function(req, res) {
     incrementRequestCount();
     var params = req.body;
-    var user;
-    var friendUser;
-    var friend;
-    var results = {};
+    var newIdStatus = req.path == "accept" ? global.status["Accepted"] : global.status["Rejected"];
 
-    if (params.username != null && params.token != null && params.friendUsername != null) {
-      async.series([
-        // authorize token
-        function(seriesCallback) {
-          auth.authToken(params.username, params.token, function(err, returnedUser) {
-            if (err) {
-              res.status(401).send({ error: err.message });
-              return seriesCallback(err);
-            } else {
-              user = returnedUser;
-              return seriesCallback();
-            }
-          });
-        },
-        // get friend user
-        function(seriesCallback) {
-          User.getUserByUsername(params.friendUsername, function(err, returnedUser) {
-            if (err) {
-              res.status(500).send({ error: err.message });
-              return seriesCallback(err);
-            } else {
-              friendUser = returnedUser;
-              return seriesCallback();
-            }
-          });
-        },
-        // get friend
-        function(seriesCallback) {
-          Friend.getFriendById(friend.id, user.id, function(err, returnedFriend) {
-            if (err) {
-              res.status(500).send({ error: err.message });
-              return seriesCallback(err);
-            } else {
-              friend = returnedFriend;
-              return seriesCallback();
-            }
-          });
-        },
-        // update friend status
-        function(seriesCallback) {
-          friend.idStatus = global.status["Rejected"];
-          friend.save(function() {
-            res.send({ success: true });
-            return seriesCallback();
-          });
-        }
-      ], function(err, results) {
-        if (err) {
-          console.log("error: " + err.message);
-        }
-        decrementRequestCount();
-      });
-    } else {
-      console.log("invalid parameters for rejectfriend route");
+    async.waterfall([
+      // get friend user
+      async.apply(User.getUserByUsername, params.friendUsername),
+      // get friend
+      function(oFriendUser, callback) {
+        Friend.getFriendById(req.oUser.id, oFriendUser.id, callback);
+      },
+      // update friend status
+      function(oFriend, callback) {
+        oFriend.idStatus = newIdStatus;
+        oFriend.save(function() {
+          res.send({ success: true });
+          return callback(err, results);
+        });
+      }
+    ], function(err) {
+      if (err) {
+        console.log("error: " + err.message);
+      }
       decrementRequestCount();
-    }
+    });
   });
 }
 
