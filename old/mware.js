@@ -1,7 +1,7 @@
-var Group = require("./model/group");
-var User = require("./model/user");
+var Group = require('./model/group');
+var User = require('./model/user');
 
-var uuid = require("node-uuid");
+var uuid = require('node-uuid');
 
 // TODO: complete route (addmember/results)
 exports.createGroup = function(user, groupName, groupMembers, callback) {
@@ -15,7 +15,7 @@ exports.createGroup = function(user, groupName, groupMembers, callback) {
         if (err) {
           return seriesCallback();
         } else {
-          return seriesCallback(new Error(global.errorcode["Group name is not unique"]));
+          return seriesCallback(new Error(global.errorcode['Group name is not unique']));
         }
       });
     },
@@ -48,17 +48,17 @@ exports.createGroup = function(user, groupName, groupMembers, callback) {
         if (id != null) {
           return seriesCallback();
         } else {
-          return seriesCallback(new Error(global.errorcode["Database insert error"]));
+          return seriesCallback(new Error(global.errorcode['Database insert error']));
         }
       });
     },
     // add admin user to group
     function(seriesCallback) {
-      var groupuser = new GroupUser(group.id, user.id, global.status["Admin"]);
+      var groupuser = new GroupUser(group.id, user.id, global.status['Admin']);
       groupuser.save(function(id) {
         if (id == null) {
           results.members = [];
-          var memberErr = { username: user.username, error: global.errorcode["Database insert error"] };
+          var memberErr = { username: user.username, error: global.errorcode['Database insert error'] };
           results.members.push(memberErr);
         }
         return seriesCallback();
@@ -115,12 +115,12 @@ exports.addMember = function(idGroup, username, callback) {
     },
     // add groupuser
     function(seriesCallback) {
-      var groupuser = new GroupUser(idGroup, user.id, global.status["Pending"]);
+      var groupuser = new GroupUser(idGroup, user.id, global.status['Pending']);
       groupuser.save(function(id) {
         if (id != null) {
           return seriesCallback();
         } else {
-          return seriesCallback(new Error(global.errorcode["Database insert error"]));
+          return seriesCallback(new Error(global.errorcode['Database insert error']));
         }
       });
     },
@@ -131,7 +131,7 @@ exports.addMember = function(idGroup, username, callback) {
     }
   ], function(err, results) {
     if (err) {
-      console.log("error: " + err.message);
+      console.log('error: ' + err.message);
     }
     return callback(err);
   });
@@ -166,14 +166,14 @@ exports.deleteMember = function(idGroup, username, callback) {
     },
     // update groupuser status
     function(seriesCallback) {
-      groupuser.idStatus = global.status["Deleted"];
+      groupuser.idStatus = global.status['Deleted'];
       groupuser.save(function() {
         return seriesCallback();
       });
     }
   ], function(err, results) {
     if (err) {
-      console.log("error: " + err.message);
+      console.log('error: ' + err.message);
     }
     return callback(err);
   });

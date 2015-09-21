@@ -4,15 +4,15 @@ var request = require('supertest');
 //var winston = require('winston');
 //var config = require('./config-debug');
 
-var sHost = "http://localhost:8888/";
+var sHost = 'http://localhost:8888/';
 
 describe('Friends', function() {
-  var testUserName = "TestUser";
-  var testUserPassword = "TestPassword";
-  var testUserEmail = "TestEmail";
-  var testFriendName = "TestFriend";
-  var testFriendPassword = "TestPassword";
-  var testFriendEmail = "TestFriendEmail";
+  var testUserName = 'TestUser';
+  var testUserPassword = 'TestPassword';
+  var testUserEmail = 'TestEmail';
+  var testFriendName = 'TestFriend';
+  var testFriendPassword = 'TestPassword';
+  var testFriendEmail = 'TestFriendEmail';
   var userToken;
   var friendToken;
 
@@ -26,9 +26,9 @@ describe('Friends', function() {
       request(sHost)
         .post('login')
         .set({ 
-          "username": testUserName,
-          "password": testUserPassword,
-          "content-type": "application/json"
+          'username': testUserName,
+          'password': testUserPassword,
+          'content-type': 'application/json'
         })
         .end(function(err, res) {
           if (err) {
@@ -47,9 +47,9 @@ describe('Friends', function() {
       request(sHost)
         .post('login')
         .set({ 
-          "username": testFriendName,
-          "password": testFriendPassword,
-          "content-type": "application/json"
+          'username': testFriendName,
+          'password': testFriendPassword,
+          'content-type': 'application/json'
         })
         .end(function(err, res) {
           if (err) {
@@ -68,15 +68,15 @@ describe('Friends', function() {
   var friendMajorUuid;
   var friendMinorUuid;
   // Testing the add friend flow
-  describe("Add Friend", function() { 
+  describe('Add Friend', function() { 
     it('should allow a user to query by username', function(done) {
       // HACK to get username
       request(sHost)
         .get('user?username=' + testFriendName)
         .set({ 
-          "username": testUserName,
-          "token": userToken,
-          "content-type": "application/json"
+          'username': testUserName,
+          'token': userToken,
+          'content-type': 'application/json'
         })
         .end(function(err, res) {
           if (err) {
@@ -96,11 +96,11 @@ describe('Friends', function() {
 
     it('should allow a user to add friends', function(done) {
       request(sHost)
-        .post('friend/' + friendMajorUuid + "/" + friendMinorUuid)
+        .post('friend/' + friendMajorUuid + '/' + friendMinorUuid)
         .set({ 
-          "username": testUserName,
-          "token": userToken,
-          "content-type": "application/json"
+          'username': testUserName,
+          'token': userToken,
+          'content-type': 'application/json'
         })
         .end(function(err, res) {
           if (err) {
@@ -117,14 +117,14 @@ describe('Friends', function() {
   });
  
   // Testing the List friend flow
-  describe("List Friend", function() { 
+  describe('List Friend', function() { 
     it('should allow a to list his friends', function(done) {
       request(sHost)
         .get('friend')
         .set({ 
-          "username": testUserName,
-          "token": userToken,
-          "content-type": "application/json"
+          'username': testUserName,
+          'token': userToken,
+          'content-type': 'application/json'
         })
         .end(function(err, res) {
           if (err) {
@@ -147,14 +147,14 @@ describe('Friends', function() {
   });
 
   // Testing the reject friend flow
-  describe("Reject Friend", function() { 
+  describe('Reject Friend', function() { 
     it('should allow a user to reject request', function(done) {
       request(sHost)
         .get('friend/reject')
         .set({ 
-          "username": testUserName,
-          "token": userToken,
-          "content-type": "application/json"
+          'username': testUserName,
+          'token': userToken,
+          'content-type': 'application/json'
         })
         .end(function(err, res) {
           if (err) {

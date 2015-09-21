@@ -1,12 +1,19 @@
 // Group class
-var id, groupName, idUser, _user, uuid, createdAt, updatedAt;
-var Access = require("./simple_table");
-var User = require("./user");
+var id;
+var groupName;
+var idUser;
+var _user;
+var uuid;
+var createdAt;
+var updatedAt;
+
+var Access = require('./simple_table');
+var User = require('./user');
 
 // constructor
 function Group(id, groupName, idUser, uuid, createdAt, updatedAt) {
   if (groupName == null || idUser == null || uuid == null) {
-    throw("Group: invalid input");
+    throw ('Group: invalid input');
   }
   
   this.id = id;
@@ -26,7 +33,7 @@ Group.prototype.save = function(callback) {
   var post = {
     groupName: local.groupName,
     idUser: local.idUser,
-    uuid: local.uuid
+    uuid: local.uuid,
   };
   
   if (local.id == null && uuid == null) {
@@ -43,7 +50,7 @@ Group.prototype.save = function(callback) {
 };
 
 function insertGroup(post, callback) {
-  var query = db.query("INSERT INTO group SET ?", post, function(err, result) {
+  var query = db.query('INSERT INTO group SET ?', post, function(err, result) {
     if (err) {
       console.log(err.message);
       db.rollback(function() {
@@ -51,7 +58,7 @@ function insertGroup(post, callback) {
       });
       return callback(null);
     } else {
-      console.log("Inserted ID " + result.insertId + " into Group");
+      console.log('Inserted ID ' + result.insertId + ' into Group');
       return callback(result.insertId);
     }
   });
@@ -59,14 +66,14 @@ function insertGroup(post, callback) {
 }
 
 function updateGroup(id, post, callback) {
-  var query = db.query("UPDATE group SET ? WHERE idGroup = ?", [post, id], function(err, result) {
+  var query = db.query('UPDATE group SET ? WHERE idGroup = ?', [post, id], function(err, result) {
     if (err) {
       console.log(err.message);
       db.rollback(function() {
         throw err;
       });
     } else {
-      console.log("Updated Group " + id);
+      console.log('Updated Group ' + id);
     }
     return callback();
   });
@@ -74,7 +81,7 @@ function updateGroup(id, post, callback) {
 }
 
 // GET: user
-Object.defineProperty(Group.prototype, "user", {
+Object.defineProperty(Group.prototype, 'user', {
   set: function() {
     var local = this;
     if (local._user == null) {
@@ -89,28 +96,28 @@ Object.defineProperty(Group.prototype, "user", {
 });
 
 Group.getGroupById = function(id, callback) {
-  Access.selectByColumn("group", "idGroup", id, "", function(result) {
+  Access.selectByColumn('group', 'idGroup', id, '', function(result) {
     if (result != null) {
       var group = new Group(result[0].idGroup,
         result[0].groupName, result[0].idUser,
         result[0].uuid, result[0].createdAt, result[0].updatedAt);
       return callback(null, group);
     } else {
-      return callback(new Error("No Group with ID " + id));
+      return callback(new Error('No Group with ID ' + id));
     }
   });
 };
 
 Group.getGroupByGroupName = function(idUser, groupName, callback) {
-  var query = "SELECT * FROM group WHERE groupName = '" + groupName + "' AND idUser = " +
-                idUser + ";";
+  var query = 'SELECT * FROM group WHERE groupName = \'' + groupName + '\' AND idUser = ' +
+                idUser + ';';
     db.query(query, function(err, result) {
       if (err) {
         console.log(query);
         console.log(err.message);
         return callback(err);
       } else if (result.length === 0) {
-        return callback(new Error("No Group with groupName " + groupName + " for User " +
+        return callback(new Error('No Group with groupName ' + groupName + ' for User ' +
                         idUser));
       } else {
         var group = new Group(result[0].idGroup,
@@ -122,20 +129,20 @@ Group.getGroupByGroupName = function(idUser, groupName, callback) {
 };
 
 Group.getGroupByUuid = function(uuid, callback) {
-  Access.selectByColumn("group", "uuid", uuid, "", function(result) {
+  Access.selectByColumn('group', 'uuid', uuid, '', function(result) {
     if (result != null) {
       var group = new Group(result[0].idGroup,
         result[0].groupName, result[0].idUser,
         result[0].uuid, result[0].createdAt, result[0].updatedAt);
       return callback(null, group);
     } else {
-      return callback(new Error("No Group with uuid " + uuid));
+      return callback(new Error('No Group with uuid ' + uuid));
     }
   });
 };
 
 Group.getGroupsByUser = function(idUser, callback) {
-  Access.selectByColumn("group", "idUser", idUser, "", function(result) {
+  Access.selectByColumn('group', 'idUser', idUser, '', function(result) {
     if (result != null) {
       var groups = [];
       for (var i = 0; i < result.length; i++) {
@@ -146,7 +153,7 @@ Group.getGroupsByUser = function(idUser, callback) {
       }
       return callback(null, groups);
     } else {
-      return callback(new Error("No Groups with ID " + id));
+      return callback(new Error('No Groups with ID ' + id));
     }
   });
 };

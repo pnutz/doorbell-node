@@ -3,23 +3,21 @@
 // helper function: runs callback on selected rows, null if no rows selected
 function selectByColumn(table, column, id, queryadd, callback) {
   var statement;
-  if (column.substring(0, 2) !== "id") {
-    statement = "SELECT * FROM " + table + " WHERE " + column + " = '" + id + "'";
-  }
-  else {
-    statement = "SELECT * FROM " + table + " WHERE " + column + " = " + id;
+  if (column.substring(0, 2) !== 'id') {
+    statement = 'SELECT * FROM ' + table + ' WHERE ' + column + ' = \'' + id + '\'';
+  } else {
+    statement = 'SELECT * FROM ' + table + ' WHERE ' + column + ' = ' + id;
   }
 
-  var query = db.query(statement + " " + queryadd, function(err, rows) {
+  var query = db.query(statement + ' ' + queryadd, function(err, rows) {
     if (err) {
       console.log(err.message);
     }
 
     if (rows.length !== 0) {
       return callback(err, rows);
-    }
-    else {
-      console.log("No rows selected");
+    } else {
+      console.log('No rows selected');
       return callback(null);
     }
   });
@@ -29,7 +27,7 @@ function selectByColumn(table, column, id, queryadd, callback) {
 // DEPRECIATED, id column isn't always id
 // returns value of object in db with id. returns null if it does not exist
 /*function getValueById(table, column, id, callback) {
-  var query = db.query("SELECT * FROM " + table + " WHERE id = " + id, function(err, rows) {
+  var query = db.query('SELECT * FROM ' + table + ' WHERE id = ' + id, function(err, rows) {
     if (err) {
       console.log(err.message);
     }
@@ -39,7 +37,7 @@ function selectByColumn(table, column, id, queryadd, callback) {
       console.log(result);
       return callback(result[column]);
     } else {
-      console.log("No rows selected");
+      console.log('No rows selected');
       return callback(null);
     }
   });
@@ -49,11 +47,10 @@ function selectByColumn(table, column, id, queryadd, callback) {
 // returns id of object in db with value. returns null if it does not exist
 function getIdByValue(table, column, value, callback) {
   var statement;
-  if (column.substring(0, 2) !== "id") {
-    statement = "SELECT * FROM " + table + " WHERE " + column + " = '" + value + "'";
-  }
-  else {
-    statement = "SELECT * FROM " + table + " WHERE " + column + " = " + value;
+  if (column.substring(0, 2) !== 'id') {
+    statement = 'SELECT * FROM ' + table + ' WHERE ' + column + ' = \'' + value + '\'';
+  } else {
+    statement = 'SELECT * FROM ' + table + ' WHERE ' + column + ' = ' + value;
   }
 
   var query = db.query(statement, function(err, rows) {
@@ -66,7 +63,7 @@ function getIdByValue(table, column, value, callback) {
       console.log(result);
       return callback(result.id);
     } else {
-      console.log("No rows selected");
+      console.log('No rows selected');
       return callback(null);
     }
   });
@@ -77,12 +74,11 @@ function getIdByValue(table, column, value, callback) {
 function save(table, column, value, callback) {
   // check if object with value already exists
   getIdByValue(table, column, value, function(resultId) {
-    if (resultId == null)
-    {
+    if (resultId == null) {
       var post = {};
       post[column] = value;
 
-      var query = db.query("INSERT INTO " + table + " SET ?", post, function(err, result) {
+      var query = db.query('INSERT INTO ' + table + ' SET ?', post, function(err, result) {
         if (err) {
           db.rollback(function() {
             if (err) {
@@ -91,7 +87,7 @@ function save(table, column, value, callback) {
           });
           return callback(err);
         } else {
-          console.log("Inserted ID " + result.insertId + " into " + table);
+          console.log('Inserted ID ' + result.insertId + ' into ' + table);
           return callback(err, result.insertId);
         }
       });
@@ -106,5 +102,5 @@ module.exports = {
   selectByColumn: selectByColumn,
   //getValueById: getValueById,
   getIdByValue: getIdByValue,
-  save: save
+  save: save,
 };

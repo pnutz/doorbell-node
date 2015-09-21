@@ -1,67 +1,67 @@
 package.json group dependency
 ------------------------
-"node-uuid": "1.x",
+'node-uuid': '1.x',
 ------------------------
 
 mysql_db/doorbellDB.js group code
 ------------------------
-"CREATE TABLE IF NOT EXISTS heroku_25e074558aecc17.Group ( " +
-  "idGroup INT NOT NULL AUTO_INCREMENT, " +
-  "idUser INT NOT NULL, " +
-  "groupName VARCHAR(45) NOT NULL, " +
-  "uuid VARCHAR(32) NOT NULL, " +
-  "createdAt TIMESTAMP NOT NULL DEFAULT 0, " +
-  "updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, " +
-  "PRIMARY KEY (idGroup), " +
-  "INDEX idUser_idx (idUser ASC), " +
-  "CONSTRAINT idUser2 " +
-    "FOREIGN KEY (idUser) " +
-    "REFERENCES heroku_25e074558aecc17.User (idUser) " +
-    "ON DELETE NO ACTION " +
-    "ON UPDATE NO ACTION) " +
-"ENGINE = InnoDB;",
+'CREATE TABLE IF NOT EXISTS heroku_25e074558aecc17.Group ( ' +
+  'idGroup INT NOT NULL AUTO_INCREMENT, ' +
+  'idUser INT NOT NULL, ' +
+  'groupName VARCHAR(45) NOT NULL, ' +
+  'uuid VARCHAR(32) NOT NULL, ' +
+  'createdAt TIMESTAMP NOT NULL DEFAULT 0, ' +
+  'updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, ' +
+  'PRIMARY KEY (idGroup), ' +
+  'INDEX idUser_idx (idUser ASC), ' +
+  'CONSTRAINT idUser2 ' +
+    'FOREIGN KEY (idUser) ' +
+    'REFERENCES heroku_25e074558aecc17.User (idUser) ' +
+    'ON DELETE NO ACTION ' +
+    'ON UPDATE NO ACTION) ' +
+'ENGINE = InnoDB;',
 
-"CREATE TABLE IF NOT EXISTS heroku_25e074558aecc17.GroupUser ( " +
-  "idGroupUser INT NOT NULL AUTO_INCREMENT, " +
-  "idGroup INT NOT NULL, " +
-  "idUser INT NOT NULL, " +
-  "idStatus INT NOT NULL, " +
-  "createdAt TIMESTAMP NOT NULL DEFAULT 0, " +
-  "updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, " +
-  "PRIMARY KEY (idGroupUser), " +
-  "INDEX idGroup_idx (idUser ASC), " +
-  "INDEX idUser_idx (idUser ASC), " +
-  "INDEX idStatus_idx (idStatus ASC), " +
-  "CONSTRAINT idGroup " +
-    "FOREIGN KEY (idGroup) " +
-    "REFERENCES heroku_25e074558aecc17.Group (idGroup) " +
-    "ON DELETE NO ACTION " +
-    "ON UPDATE NO ACTION, " +
-  "CONSTRAINT idUser3 " +
-    "FOREIGN KEY (idUser) " +
-    "REFERENCES heroku_25e074558aecc17.User (idUser) " +
-    "ON DELETE NO ACTION " +
-    "ON UPDATE NO ACTION, " +
-  "CONSTRAINT idStatus2 " +
-    "FOREIGN KEY (idStatus) " +
-    "REFERENCES heroku_25e074558aecc17.Status (idStatus) " +
-    "ON DELETE NO ACTION " +
-    "ON UPDATE NO ACTION) " +
-"ENGINE = InnoDB;"
+'CREATE TABLE IF NOT EXISTS heroku_25e074558aecc17.GroupUser ( ' +
+  'idGroupUser INT NOT NULL AUTO_INCREMENT, ' +
+  'idGroup INT NOT NULL, ' +
+  'idUser INT NOT NULL, ' +
+  'idStatus INT NOT NULL, ' +
+  'createdAt TIMESTAMP NOT NULL DEFAULT 0, ' +
+  'updatedAt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, ' +
+  'PRIMARY KEY (idGroupUser), ' +
+  'INDEX idGroup_idx (idUser ASC), ' +
+  'INDEX idUser_idx (idUser ASC), ' +
+  'INDEX idStatus_idx (idStatus ASC), ' +
+  'CONSTRAINT idGroup ' +
+    'FOREIGN KEY (idGroup) ' +
+    'REFERENCES heroku_25e074558aecc17.Group (idGroup) ' +
+    'ON DELETE NO ACTION ' +
+    'ON UPDATE NO ACTION, ' +
+  'CONSTRAINT idUser3 ' +
+    'FOREIGN KEY (idUser) ' +
+    'REFERENCES heroku_25e074558aecc17.User (idUser) ' +
+    'ON DELETE NO ACTION ' +
+    'ON UPDATE NO ACTION, ' +
+  'CONSTRAINT idStatus2 ' +
+    'FOREIGN KEY (idStatus) ' +
+    'REFERENCES heroku_25e074558aecc17.Status (idStatus) ' +
+    'ON DELETE NO ACTION ' +
+    'ON UPDATE NO ACTION) ' +
+'ENGINE = InnoDB;'
 ------------------------
 
 mysql_db/dbInit.js group errorcodes
 ------------------------
-"Group name is not unique",
-"Group already contains username",
+'Group name is not unique',
+'Group already contains username',
 ------------------------
 
 server.js group code
 ------------------------
-  var Group = require("./model/group");
-  var GroupUser = require("./model/groupuser");
+  var Group = require('./model/group');
+  var GroupUser = require('./model/groupuser');
 
-  var mware = require("./mware");
+  var mware = require('./mware');
   
   global.app.post('/addgroup', function(req, res) {
     incrementRequestCount();
@@ -96,12 +96,12 @@ server.js group code
         }
       ], function(err, results) {
         if (err) {
-          console.log("error: " + err.message);
+          console.log('error: ' + err.message);
         }
         decrementRequestCount();
       });
     } else {
-      console.log("invalid parameters for addgroup route");
+      console.log('invalid parameters for addgroup route');
       decrementRequestCount();
     }
   });
@@ -145,7 +145,7 @@ server.js group code
           async.eachSeries(params.members, function(member, eachCallback) {
             mware.addMember(group.id, member, function(err) {
               if (err) {
-                if (!results.hasOwnProperty("members")) {
+                if (!results.hasOwnProperty('members')) {
                   results.members = [];
                 }
                 var memberErr = { username: member, error: err.message };
@@ -163,9 +163,9 @@ server.js group code
         }
       ], function(err, results) {
         if (err) {
-          console.log("error: " + err.message);
+          console.log('error: ' + err.message);
         } else {
-          if (!results.hasOwnProperty("members")) {
+          if (!results.hasOwnProperty('members')) {
             results.success = true;
           }
           res.send(results);
@@ -173,7 +173,7 @@ server.js group code
         decrementRequestCount();
       });
     } else {
-      console.log("invalid parameters for addmember route");
+      console.log('invalid parameters for addmember route');
       decrementRequestCount();
     }
   });
@@ -217,7 +217,7 @@ server.js group code
           async.eachSeries(params.members, function(member, eachCallback) {
             mware.deleteMember(group.id, member, function(err) {
               if (err) {
-                if (!results.hasOwnProperty("members")) {
+                if (!results.hasOwnProperty('members')) {
                   results.members = [];
                 }
                 var memberErr = { username: member, error: err.message };
@@ -235,9 +235,9 @@ server.js group code
         }
       ], function(err, results) {
         if (err) {
-          console.log("error: " + err.message);
+          console.log('error: ' + err.message);
         } else {
-          if (!results.hasOwnProperty("members")) {
+          if (!results.hasOwnProperty('members')) {
             results.success = true;
           }
           res.send(results);
@@ -245,7 +245,7 @@ server.js group code
         decrementRequestCount();
       });
     } else {
-      console.log("invalid parameters for deletemember route");
+      console.log('invalid parameters for deletemember route');
       decrementRequestCount();
     }
   });
@@ -298,7 +298,7 @@ server.js group code
         },
         // update groupuser status
         function(seriesCallback) {
-          groupuser.idStatus = global.status["Accepted"];
+          groupuser.idStatus = global.status['Accepted'];
           groupuser.save(function() {
             res.send({ success: true });
             return seriesCallback();
@@ -306,12 +306,12 @@ server.js group code
         }
       ], function(err, results) {
         if (err) {
-          console.log("error: " + err.message);
+          console.log('error: ' + err.message);
         }
         decrementRequestCount();
       });
     } else {
-      console.log("invalid parameters for acceptgroup route");
+      console.log('invalid parameters for acceptgroup route');
       decrementRequestCount();
     }
   });
@@ -364,7 +364,7 @@ server.js group code
         },
         // update groupuser status
         function(seriesCallback) {
-          groupuser.idStatus = global.status["Rejected"];
+          groupuser.idStatus = global.status['Rejected'];
           groupuser.save(function() {
             res.send({ success: true });
             return seriesCallback();
@@ -372,12 +372,12 @@ server.js group code
         }
       ], function(err, results) {
         if (err) {
-          console.log("error: " + err.message);
+          console.log('error: ' + err.message);
         }
         decrementRequestCount();
       });
     } else {
-      console.log("invalid parameters for rejectgroup route");
+      console.log('invalid parameters for rejectgroup route');
       decrementRequestCount();
     }
   });

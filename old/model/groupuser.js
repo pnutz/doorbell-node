@@ -1,14 +1,22 @@
 // GroupUser class
-var idGroup, _group, idUser, _user, idStatus, _status, createdAt, updatedAt;
-var Access = require("./simple_table");
-var User = require("./user");
-var Group = require("./group");
-var Status = require("./status");
+var idGroup;
+var _group;
+var idUser;
+var _user;
+var idStatus;
+var _status;
+var createdAt;
+var updatedAt;
+
+var Access = require('./simple_table');
+var User = require('./user');
+var Group = require('./group');
+var Status = require('./status');
 
 // constructor
 function GroupUser(idGroup, idUser, idStatus, createdAt, updatedAt) {
   if (idGroup == null || idUser == null || idStatus == null) {
-    throw("GroupUser: invalid input");
+    throw ('GroupUser: invalid input');
   }
   
   this.idGroup = idGroup;
@@ -28,7 +36,7 @@ GroupUser.prototype.save = function(callback) {
   var post = {
     idGroup: local.idGroup,
     idUser: local.idUser,
-    idStatus: local.idStatus
+    idStatus: local.idStatus,
   };
   
   if (local.id == null) {
@@ -44,7 +52,7 @@ GroupUser.prototype.save = function(callback) {
 };
 
 function insertGroupUser(post, callback) {
-  var query = db.query("INSERT INTO groupuser SET ?", post, function(err, result) {
+  var query = db.query('INSERT INTO groupuser SET ?', post, function(err, result) {
     if (err) {
       console.log(err.message);
       db.rollback(function() {
@@ -52,7 +60,7 @@ function insertGroupUser(post, callback) {
       });
       return callback(null);
     } else {
-      console.log("Inserted ID " + result.insertId + " into GroupUser");
+      console.log('Inserted ID ' + result.insertId + ' into GroupUser');
       return callback(result.insertId);
     }
   });
@@ -60,7 +68,7 @@ function insertGroupUser(post, callback) {
 }
 
 function updateGroupUser(idGroup, idUser, post, callback) {
-  var query = db.query("UPDATE groupuser SET ? WHERE idGroup = ? AND idUser = ?",
+  var query = db.query('UPDATE groupuser SET ? WHERE idGroup = ? AND idUser = ?',
     [post, idGroup, idUser], function(err, result) {
     if (err) {
       console.log(err.message);
@@ -68,7 +76,7 @@ function updateGroupUser(idGroup, idUser, post, callback) {
         throw err;
       });
     } else {
-      console.log("Updated GroupUser with idGroup: " + idGroup + " and idUser: " + idUser);
+      console.log('Updated GroupUser with idGroup: ' + idGroup + ' and idUser: ' + idUser);
     }
     return callback();
   });
@@ -76,7 +84,7 @@ function updateGroupUser(idGroup, idUser, post, callback) {
 }
 
 // GET: group
-Object.defineProperty(GroupUser.prototype, "group", {
+Object.defineProperty(GroupUser.prototype, 'group', {
   set: function() {
     var local = this;
     if (local._group == null) {
@@ -91,7 +99,7 @@ Object.defineProperty(GroupUser.prototype, "group", {
 });
 
 // GET: user
-Object.defineProperty(GroupUser.prototype, "user", {
+Object.defineProperty(GroupUser.prototype, 'user', {
   set: function() {
     var local = this;
     if (local._user == null) {
@@ -106,7 +114,7 @@ Object.defineProperty(GroupUser.prototype, "user", {
 });
 
 // GET: status
-Object.defineProperty(GroupUser.prototype, "status", {
+Object.defineProperty(GroupUser.prototype, 'status', {
   set: function() {
     var local = this;
     if (local._status == null) {
@@ -121,15 +129,15 @@ Object.defineProperty(GroupUser.prototype, "status", {
 });
 
 GroupUser.getGroupUserById = function(idGroup, idUser, callback) {
-  var query = "SELECT * FROM groupuser WHERE idGroup = " + idGroup + " AND idUser = " +
-                idUser + ";";
+  var query = 'SELECT * FROM groupuser WHERE idGroup = ' + idGroup + ' AND idUser = ' +
+                idUser + ';';
   db.query(query, function(err, result) {
     if (err) {
       console.log(query);
       console.log(err.message);
       return callback(err);
     } else if (result.length === 0) {
-      return callback(new Error("No GroupUser with idGroup " + idGroup + " and idUser " +
+      return callback(new Error('No GroupUser with idGroup ' + idGroup + ' and idUser ' +
                       idUser));
     } else {
       var groupuser = new GroupUser(result[0].idGroup, result[0].idUser,
@@ -140,7 +148,7 @@ GroupUser.getGroupUserById = function(idGroup, idUser, callback) {
 };
 
 GroupUser.getUsersByGroup = function(idGroup, callback) {
-  Access.selectByColumn("groupuser", "idGroup", idGroup, "", function(result) {
+  Access.selectByColumn('groupuser', 'idGroup', idGroup, '', function(result) {
     if (result != null) {
       var groupusers = [];
       for (var i = 0; i < result.length; i++) {
@@ -150,13 +158,13 @@ GroupUser.getUsersByGroup = function(idGroup, callback) {
       }
       return callback(null, groupusers);
     } else {
-      return callback(new Error("No GroupUsers for idGroup " + idGroup));
+      return callback(new Error('No GroupUsers for idGroup ' + idGroup));
     }
   });
 };
 
 GroupUser.getGroupsByUser = function(idUser, callback) {
-  Access.selectByColumn("groupuser", "idUser", idUser, "", function(result) {
+  Access.selectByColumn('groupuser', 'idUser', idUser, '', function(result) {
     if (result != null) {
       var groupusers = [];
       for (var i = 0; i < result.length; i++) {
@@ -166,21 +174,21 @@ GroupUser.getGroupsByUser = function(idUser, callback) {
       }
       return callback(null, groupusers);
     } else {
-      return callback(new Error("No GroupUsers for idUser" + idUser));
+      return callback(new Error('No GroupUsers for idUser' + idUser));
     }
   });
 };
 
 GroupUser.getUsersByGroupStatus = function(idGroup, idStatus, callback) {
-  var query = "SELECT * FROM groupuser WHERE idGroup = " + idGroup + " AND idStatus = " +
-                idStatus + ";";
+  var query = 'SELECT * FROM groupuser WHERE idGroup = ' + idGroup + ' AND idStatus = ' +
+                idStatus + ';';
   db.query(query, function(err, result) {
     if (err) {
       console.log(query);
       console.log(err.message);
       return callback(err);
     } else if (result == null) {
-      return callback(new Error("No GroupUsers for idGroup " + idGroup + " with idStatus " +
+      return callback(new Error('No GroupUsers for idGroup ' + idGroup + ' with idStatus ' +
                       idStatus));
     } else {
       var groupusers = [];

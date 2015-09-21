@@ -1,11 +1,13 @@
 // Status class
-var id, status;
-var Access = require("./simple_table");
+var id;
+var status;
+
+var Access = require('./simple_table');
 
 // constructor
 function Status(id, status) {
   if (status == null) {
-    throw("Status: invalid input");
+    throw ('Status: invalid input');
   }
   
   this.id = id;
@@ -29,7 +31,7 @@ Status.prototype.save = function(callback) {
 };
 
 function insertStatus(post, callback) {
-  var query = db.query("INSERT INTO status SET ?", post, function(err, result) {
+  var query = db.query('INSERT INTO status SET ?', post, function(err, result) {
     if (err) {
       console.log(err.Message);
       db.rollback(function() {
@@ -37,7 +39,7 @@ function insertStatus(post, callback) {
       });
       return callback(null);
     } else {
-      console.log("Inserted ID " + result.insertId + " into Status");
+      console.log('Inserted ID ' + result.insertId + ' into Status');
       return callback(result.insertId);
     }
   });
@@ -45,14 +47,14 @@ function insertStatus(post, callback) {
 }
 
 function updateStatus(id, post, callback) {
-  var query = db.query("UPDATE status SET ? WHERE idStatus = ?", [post, id], function(err, result) {
+  var query = db.query('UPDATE status SET ? WHERE idStatus = ?', [post, id], function(err, result) {
     if (err) {
       console.log(err.Message);
       db.rollback(function() {
         throw err;
       });
     } else {
-      console.log("Updated Status " + id);
+      console.log('Updated Status ' + id);
     }
     return callback();
   });
@@ -60,12 +62,12 @@ function updateStatus(id, post, callback) {
 }
 
 Status.getStatusById = function(id, callback) {
-  Access.selectByColumn("status", "idStatus", id, "", function(err, result) {
+  Access.selectByColumn('status', 'idStatus', id, '', function(err, result) {
     if (result != null) {
       var status = new Status(result[0].idStatus, result[0].status);
       return callback(null, status);
     } else {
-      return callback(new Error("No Status with ID " + id));
+      return callback(new Error('No Status with ID ' + id));
     }
   });
 };

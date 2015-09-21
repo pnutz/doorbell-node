@@ -1,13 +1,13 @@
-var mysql = require("mysql");
-var async = require("async");
-var script = require("./mysql_db/doorbellDB");
-var debug = require("debug")("db");
+var mysql = require('mysql');
+var async = require('async');
+var script = require('./mysql_db/doorbellDB');
+var debug = require('debug')('db');
 
 var db_config = {
-  host: "us-cdbr-iron-east-01.cleardb.net",
-  user: "b40e0fd1ab928a",
-  password: "3bacecd4",
-  database: "heroku_25e074558aecc17"
+  host: 'us-cdbr-iron-east-01.cleardb.net',
+  user: 'b40e0fd1ab928a',
+  password: '3bacecd4',
+  database: 'heroku_25e074558aecc17'
 };
 
 var connection;
@@ -20,7 +20,7 @@ function initHandleDisconnect(callback) {
       console.log('Error when connecting to DB:', err);
       setTimeout(handleDisconnect, 2000);
     }
-    debug("Connected to MySQL Database");
+    debug('Connected to MySQL Database');
   });
   
   // connection lost due to server restart, connection idle timeout
@@ -45,7 +45,7 @@ function handleDisconnect() {
       console.log('Error when connecting to DB:', err);
       setTimeout(handleDisconnect, 2000);
     }
-    debug("Reconnected to MySQL Database");
+    debug('Reconnected to MySQL Database');
   });
   
   // connection lost due to server restart, connection idle timeout
@@ -73,7 +73,7 @@ function connect(resultCallback) {
           console.log(query);
           throw err;
         }
-        debug("Database Created");
+        debug('Database Created');
         return callback();
       });
     },
@@ -84,7 +84,7 @@ function connect(resultCallback) {
           console.log(query);
           throw err;
         }
-        debug("Using Database");
+        debug('Using Database');
         return callback();
       });
     },
@@ -102,7 +102,7 @@ function connect(resultCallback) {
           throw err;
         }
         
-        debug("Initialized Database Tables");
+        debug('Initialized Database Tables');
         return callback();
       });
     }

@@ -1,10 +1,10 @@
-var User = require("./model/user");
+var User = require('./model/user');
 
-var async = require ("async");
-var bcrypt = require("bcryptjs");
-var jwt = require("jwt-simple");
-var moment = require("moment");
-var rand = require("random-seed").create();
+var async = require ('async');
+var bcrypt = require('bcryptjs');
+var jwt = require('jwt-simple');
+var moment = require('moment');
+var rand = require('random-seed').create();
 
 // sign up route
 exports.signUp = function(username, password, email, callback) {
@@ -19,7 +19,7 @@ exports.signUp = function(username, password, email, callback) {
         if (!userResult) {
           return seriesCallback();
         } else {
-          return seriesCallback(new Error(global.errorcode["Username taken"]));
+          return seriesCallback(new Error(global.errorcode['Username taken']));
         }
       });
     },
@@ -29,7 +29,7 @@ exports.signUp = function(username, password, email, callback) {
         if (!userResult) {
           return seriesCallback();
         } else {
-          return seriesCallback(new Error(global.errorcode["Email taken"]));
+          return seriesCallback(new Error(global.errorcode['Email taken']));
         }
       });
     },
@@ -71,7 +71,7 @@ exports.signUp = function(username, password, email, callback) {
         if (id != null) {
           return seriesCallback();
         } else {
-          return seriesCallback(new Error(global.errorcode["Database insert error"]));
+          return seriesCallback(new Error(global.errorcode['Database insert error']));
         }
       });
     }
@@ -95,7 +95,7 @@ exports.logIn = function(username, password, callback) {
     function(seriesCallback) {
       User.getUserByUsername(username, function(err, userResult) {
         if (err) {
-          return seriesCallback(new Error(global.errorcode["Username does not exist"]));
+          return seriesCallback(new Error(global.errorcode['Username does not exist']));
         } else {
           user = userResult;
           return seriesCallback();
@@ -108,7 +108,7 @@ exports.logIn = function(username, password, callback) {
         token = generateToken(user);
         return seriesCallback();
       } else {
-        return seriesCallback(new Error(global.errorcode["Incorrect password"]));
+        return seriesCallback(new Error(global.errorcode['Incorrect password']));
       }
     }
   ], function(err, results) {
@@ -131,13 +131,13 @@ exports.logIn = function(username, password, callback) {
 exports.authToken = function(sUsername, sToken, fnCallback) {
   // Verify input
   if (sUsername == null || sToken == null)
-      return fnCallback(new Error("Invalid username/token"));
+      return fnCallback(new Error('Invalid username/token'));
 
   try {
-    var decoded = jwt.decode(sToken, app.get("jwtTokenSecret"));
+    var decoded = jwt.decode(sToken, app.get('jwtTokenSecret'));
 
     if (decoded.exp <= Date.now()) {
-      return fnCallback(new Error(global.errorcode["Expired token"]));
+      return fnCallback(new Error(global.errorcode['Expired token']));
     }
 
     // Fetch user object
@@ -147,11 +147,11 @@ exports.authToken = function(sUsername, sToken, fnCallback) {
       }
 
       if (oRetrievedUser == null) {
-        return fnCallback(new Error(global.errorcode["Username does not exist"]));
+        return fnCallback(new Error(global.errorcode['Username does not exist']));
       }
       
       if (oRetrievedUser.id != decoded.iss) {
-        return fnCallback(new Error(global.errorcode["Token does not match user"]));
+        return fnCallback(new Error(global.errorcode['Token does not match user']));
       }
 
       // Success
@@ -159,16 +159,16 @@ exports.authToken = function(sUsername, sToken, fnCallback) {
     });
 
   } catch (err) {
-    return fnCallback(new Error(global.errorcode["Invalid token"]));
+    return fnCallback(new Error(global.errorcode['Invalid token']));
   }
 };
 
 // token expires in 7 days
 function generateToken(user) {
-  var expires = moment().add(7, "days").valueOf();
+  var expires = moment().add(7, 'days').valueOf();
   var token = jwt.encode({
                             iss: user.id,
                             exp: expires
-                          }, global.app.get("jwtTokenSecret"));
+                          }, global.app.get('jwtTokenSecret'));
   return token;
 }

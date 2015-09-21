@@ -1,11 +1,11 @@
-var server = require("./server");
-var mysql = require("./db");
-var async = require("async");
-var debug = require("debug")("debug");
+var server = require('./server');
+var mysql = require('./db');
+var async = require('async');
+var debug = require('debug')('debug');
 
-var Init = require("./mysql_db/dbInit");
-var Status = require("./model/status");
-var ErrorCode = require("./model/errorcode");
+var Init = require('./mysql_db/dbInit');
+var Status = require('./model/status');
+var ErrorCode = require('./model/errorcode');
 
 global.status = {};
 global.errorcode = {};
@@ -17,7 +17,7 @@ async.series([
   },
   // check if database contains status data
   function(callback) {
-    var query = "SELECT * FROM status;";
+    var query = 'SELECT * FROM status;';
     db.query(query, function(err, result) {
       if (err) {
         console.log(query);
@@ -42,7 +42,7 @@ async.series([
               global.status[statusData] = idStatus;
               return eachCallback();
             } else {
-              return eachCallback(new Error("failed status creation"));
+              return eachCallback(new Error('failed status creation'));
             }
           });
         }, function(err) {
@@ -56,7 +56,7 @@ async.series([
   },
   // check if database contains errorcode data
   function(callback) {
-    var query = "SELECT * FROM errorcode;";
+    var query = 'SELECT * FROM errorcode;';
     db.query(query, function(err, result) {
       if (err) {
         console.log(query);
@@ -81,7 +81,7 @@ async.series([
               global.errorcode[errorCodeData] = idErrorCode;
               return eachCallback();
             } else {
-              return eachCallback(new Error("failed errorcode creation"));
+              return eachCallback(new Error('failed errorcode creation'));
             }
           });
         }, function(err) {
@@ -97,4 +97,5 @@ async.series([
   function(callback) {
     server.start();
     return callback();
-  }]);
+  }
+]);

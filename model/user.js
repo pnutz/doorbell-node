@@ -1,12 +1,21 @@
 // User class
-var id, username, password, majorUuid, minorUuid, email, deviceToken, createdAt, updatedAt;
-var Access = require("./simple_table");
+var id;
+var username;
+var password;
+var majorUuid;
+var minorUuid;
+var email;
+var deviceToken;
+var createdAt;
+var updatedAt;
+
+var Access = require('./simple_table');
 
 // constructor
 function User(id, username, password, majorUuid, minorUuid, email, deviceToken, createdAt, updatedAt) {
   if (username == null || password == null ||
-      majorUuid == null ||minorUuid == null || email == null) {
-    throw("User: invalid input");
+      majorUuid == null || minorUuid == null || email == null) {
+    throw ('User: invalid input');
   }  
   this.id = id;
   this.username = username;
@@ -29,7 +38,7 @@ User.prototype.save = function(callback) {
     majorUuid: local.majorUuid,
     minorUuid: local.minorUuid,
     email: local.email,
-    deviceToken: local.deviceToken
+    deviceToken: local.deviceToken,
   };
   
   if (local.id == null) {
@@ -46,7 +55,7 @@ User.prototype.save = function(callback) {
 };
 
 function insertUser(post, callback) {
-  var query = db.query("INSERT INTO user SET ?", post, function(err, result) {
+  var query = db.query('INSERT INTO user SET ?', post, function(err, result) {
     if (err) {
       console.log(err.message);
       db.rollback(function() {
@@ -54,7 +63,7 @@ function insertUser(post, callback) {
       });
       return callback(null);
     } else {
-      console.log("Inserted ID " + result.insertId + " into User");
+      console.log('Inserted ID ' + result.insertId + ' into User');
       return callback(result.insertId);
     }
   });
@@ -62,14 +71,14 @@ function insertUser(post, callback) {
 }
 
 function updateUser(id, post, callback) {
-  var query = db.query("UPDATE user SET ? WHERE idUser = ?", [post, id], function(err, result) {
+  var query = db.query('UPDATE user SET ? WHERE idUser = ?', [post, id], function(err, result) {
     if (err) {
       console.log(err.message);
       db.rollback(function() {
         throw err;
       });
     } else {
-      console.log("Updated User " + id);
+      console.log('Updated User ' + id);
     }
     return callback();
   });
@@ -77,7 +86,7 @@ function updateUser(id, post, callback) {
 }
 
 User.getUserById = function(id, callback) {
-  Access.selectByColumn("user", "idUser", id, "", function(err, result) {
+  Access.selectByColumn('user', 'idUser', id, '', function(err, result) {
     if (result != null) {
       var user = new User(result[0].idUser, result[0].username,
         result[0].password, result[0].majorUuid,
@@ -85,15 +94,15 @@ User.getUserById = function(id, callback) {
         result[0].createdAt, result[0].updatedAt);
       return callback(null, user);
     } else {
-      return callback(new Error("No User with ID " + id));
+      return callback(new Error('No User with ID ' + id));
     }
   });
 };
 
 User.getUserByUsername = function(username, callback) {
-  Access.selectByColumn("user", "username", username, "", function(err, result) {
+  Access.selectByColumn('user', 'username', username, '', function(err, result) {
     if (err) {
-      return callback(new Error("Error looking for user" + username));
+      return callback(new Error('Error looking for user' + username));
     }
     if (result != null) {
       var user = new User(result[0].idUser, result[0].username,
@@ -102,13 +111,13 @@ User.getUserByUsername = function(username, callback) {
         result[0].createdAt, result[0].updatedAt);
       return callback(null, user);
     } else {
-      return callback(new Error("No User with username " + username));
+      return callback(new Error('No User with username ' + username));
     }
   });
 };
 
 User.getUserByEmail = function(email, callback) {
-  Access.selectByColumn("user", "email", email, "", function(err, result) {
+  Access.selectByColumn('user', 'email', email, '', function(err, result) {
     if (result != null) {
       var user = new User(result[0].idUser, result[0].username,
         result[0].password, result[0].majorUuid,
@@ -116,21 +125,21 @@ User.getUserByEmail = function(email, callback) {
         result[0].createdAt, result[0].updatedAt);
       return callback(null, user);
     } else {
-      return callback(new Error("No User with email " + email));
+      return callback(new Error('No User with email ' + email));
     }
   });
 };
 
 User.getUserByUuid = function(majorUuid, minorUuid, callback) {
-  var query = "SELECT * FROM user WHERE majorUuid = " + majorUuid + " AND minorUuid = " +
-                minorUuid + ";";
+  var query = 'SELECT * FROM user WHERE majorUuid = ' + majorUuid + ' AND minorUuid = ' +
+                minorUuid + ';';
     db.query(query, function(err, result) {
       if (err) {
         console.log(query);
         console.log(err.message);
         return callback(err);
       } else if (result.length === 0) {
-        return callback(new Error("No User with majorUuid " + majorUuid + " and minorUuid " +
+        return callback(new Error('No User with majorUuid ' + majorUuid + ' and minorUuid ' +
                         minorUuid));
       } else {
         var user = new User(result[0].idUser, result[0].username,

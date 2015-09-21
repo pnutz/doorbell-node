@@ -1,11 +1,13 @@
 // ErrorCode class
-var id, error;
-var Access = require("./simple_table");
+var id;
+var error;
+
+var Access = require('./simple_table');
 
 // constructor
 function ErrorCode(id, error) {
   if (error == null) {
-    throw("ErrorCode: invalid input");
+    throw ('ErrorCode: invalid input');
   }
   
   this.id = id;
@@ -29,7 +31,7 @@ ErrorCode.prototype.save = function(callback) {
 };
 
 function insertErrorCode(post, callback) {
-  var query = db.query("INSERT INTO errorcode SET ?", post, function(err, result) {
+  var query = db.query('INSERT INTO errorcode SET ?', post, function(err, result) {
     if (err) {
       console.log(err.Message);
       db.rollback(function() {
@@ -37,7 +39,7 @@ function insertErrorCode(post, callback) {
       });
       return callback(null);
     } else {
-      console.log("Inserted ID " + result.insertId + " into ErrorCode");
+      console.log('Inserted ID ' + result.insertId + ' into ErrorCode');
       return callback(result.insertId);
     }
   });
@@ -45,14 +47,14 @@ function insertErrorCode(post, callback) {
 }
 
 function updateErrorCode(id, post, callback) {
-  var query = db.query("UPDATE errorcode SET ? WHERE idErrorCode = ?", [post, id], function(err, result) {
+  var query = db.query('UPDATE errorcode SET ? WHERE idErrorCode = ?', [post, id], function(err, result) {
     if (err) {
       console.log(err.Message);
       db.rollback(function() {
         throw err;
       });
     } else {
-      console.log("Updated ErrorCode " + id);
+      console.log('Updated ErrorCode ' + id);
     }
     return callback();
   });
@@ -60,12 +62,12 @@ function updateErrorCode(id, post, callback) {
 }
 
 ErrorCode.getErrorCodeById = function(id, callback) {
-  Access.selectByColumn("errorcode", "idErrorCode", id, "", function(err, result) {
+  Access.selectByColumn('errorcode', 'idErrorCode', id, '', function(err, result) {
     if (result != null) {
       var error = new ErrorCode(result[0].idErrorCode, result[0].error);
       return callback(null, error);
     } else {
-      return callback(new Error("No ErrorCode with ID " + id));
+      return callback(new Error('No ErrorCode with ID ' + id));
     }
   });
 };
