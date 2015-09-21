@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "scripts": {
     "start": "node index.js",
-    "debug": "node debug index.js",
+    "debug": "node debug index.js"
   },
   "private": true,
   "dependencies": {
@@ -18,9 +18,9 @@
     "mysql": "2.x",
     "node-uuid": "1.x",
     "parse": "1.x",
-    "random-seed": "0.x",
+    "random-seed": "0.x"
   },
   "devDependencies": {
-    "frisby": "^0.8.5",
+    "frisby": "^0.8.5"
   }
 }

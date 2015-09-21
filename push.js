@@ -20,7 +20,7 @@ exports.sendPushNotification = function(deviceToken, alert, requester, callback)
   var data = {
     alert: alert,
     requester: requester,
-    category: 'category_action_accept_friend'
+    category: 'category_action_accept_friend',
   };
   
   console.log(query);
