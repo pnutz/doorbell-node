@@ -24,7 +24,72 @@ function selectByColumn(table, column, id, queryadd, callback) {
   console.log(query.sql);
 }
 
-// DEPRECIATED, id column isn't always id
+/**
+ * @brief Weird function name, allows us to specify which columns to be returned
+ */
+function selectColumnsByColumn(table, column, returnColumns, id, queryadd, callback) {
+  var statement;
+  // Create a string from the desired columns
+  var arrayLen = returnColumns.length;
+  // If empty list assume all otherwise use first item
+  var selectString = arrayLen > 0 ? '*' : returnColumns[0];
+  for (var count = 1; count < arrayLen; ++count)
+    selectString += ',' + returnColumns[count];
+
+  if (column.substring(0, 2) !== 'id') {
+    statement = 'SELECT ' + selectString + ' FROM ' + table + ' WHERE ' + column + ' = \'' + id + '\'';
+  } else {
+    statement = 'SELECT ' + selectString + ' FROM ' + table + ' WHERE ' + column + ' = ' + id;
+  }
+
+  var query = db.query(statement + ' ' + queryadd, function(err, rows) {
+    if (err) {
+      console.log(err.message);
+    }
+
+    if (rows.length !== 0) {
+      return callback(err, rows);
+    } else {
+      console.log('No rows selected');
+      return callback(null);
+    }
+  });
+  console.log(query.sql);
+}
+
+/**
+ * @brief Return specific rows based on column values
+ */
+function selectRowsByColumnValues(sTable, sColumn, aValues, sQueryAdd, fnCallback) {
+  var iArrayLen = aValues.length;
+  if (iArrayLen <= 0)
+    return fnCallback({err : "No column values provided"});
+  var sStatement;
+  // Create a string from the desired columns
+  // If empty list assume all otherwise use first item
+  var sSelectString = aValues[0];
+  for (var count = 1; count < iArrayLen; ++count)
+    sSelectString += ',' + aValues[count];
+
+  sStatement = 'SELECT * FROM ' + sTable + ' WHERE ' + sColumn + ' IN (' + sSelectString + ')';
+
+  var query = db.query(sStatement + ' ' + sQueryAdd, function(err, rows) {
+    if (err) {
+      console.log(err.message);
+    }
+
+    if (rows.length !== 0) {
+      return fnCallback(err, rows);
+    } else {
+      console.log('No rows selected');
+      return fnCallback(null);
+    }
+  });
+  console.log(query.sql);
+}
+
+
+// DEPRECATED, id column isn't always id
 // returns value of object in db with id. returns null if it does not exist
 /*function getValueById(table, column, id, callback) {
   var query = db.query('SELECT * FROM ' + table + ' WHERE id = ' + id, function(err, rows) {
@@ -102,5 +167,7 @@ module.exports = {
   selectByColumn: selectByColumn,
   //getValueById: getValueById,
   getIdByValue: getIdByValue,
+  selectColumnsByColumn: selectColumnsByColumn,
+  selectRowsByColumnValues: selectRowsByColumnValues,
   save: save,
 };

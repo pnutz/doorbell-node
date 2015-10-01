@@ -99,6 +99,20 @@ User.getUserById = function(id, callback) {
   });
 };
 
+User.getUsersByIdList = function(aIds, callback) {
+  Access.selectRowsByColumnValues('user', 'idUser', aIds, '', function(err, result) {
+    if (result != null) {
+      var user = new User(result[0].idUser, result[0].username,
+        result[0].password, result[0].majorUuid,
+        result[0].minorUuid, result[0].email, result[0].deviceToken,
+        result[0].createdAt, result[0].updatedAt);
+      return callback(null, user);
+    } else {
+      return callback(new Error('No User with ID ' + id));
+    }
+  });
+};
+
 User.getUserByUsername = function(username, callback) {
   Access.selectByColumn('user', 'username', username, '', function(err, result) {
     if (err) {

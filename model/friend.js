@@ -178,6 +178,24 @@ Friend.getFriendsByUser = function(oUser, callback) {
   });
 };
 
+/**
+ * @brief returns a list of values corresponding to the specified column name
+ *        allows for easier iteration
+ */
+Friend.getSingleColumnListByUser = function(oUser, callback) {
+  Access.selectColumnsByColumn('friend', 'idUser', ['idFriend'], oUser.id, '', function(err, result) {
+    if (result != null) {
+      var friends = [];
+      for (var i = 0; i < result.length; i++) {
+        friends.push(result[i].idFriend);
+     }
+      return callback(null, friends);
+    } else {
+      return callback(new Error('No Friends for idFriendUser ' + idFriendUser));
+    }
+  });
+};
+
 Friend.getFriendsByFriendUser = function(idFriend, callback) {
   Access.selectByColumn('friend', 'idFriendUser', idFriend, '', function(err, result) {
     if (result != null) {
@@ -186,7 +204,7 @@ Friend.getFriendsByFriendUser = function(idFriend, callback) {
         var friend = new Friend(result[0].idUser, result[0].idFriendUser,
           result[0].idStatus, result[0].createdAt, result[0].updatedAt);
         friends.push(friend);
-      }
+     }
       return callback(null, friends);
     } else {
       return callback(new Error('No Friends for idFriendUser ' + idFriendUser));

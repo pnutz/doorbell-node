@@ -209,8 +209,10 @@ function start() {
 
   global.app.get('/friend', function(req, res) {
     console.log('listing friends');
-    Friend.getFriendsByUser(
-      req.oUser, 
+    async.waterfall([
+      async.apply(Friend.getSingleColumnListByUser, req.oUser),
+      User.getUsersByIdList
+      ],
       function(err, results) {
         if (err) {
           res.status(500).send({error : err.message});
