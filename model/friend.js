@@ -183,13 +183,14 @@ Friend.getFriendsByUser = function(oUser, callback) {
  *        allows for easier iteration
  */
 Friend.getSingleColumnListByUser = function(oUser, callback) {
-  Access.selectColumnsByColumn('friend', 'idUser', ['idFriend'], oUser.id, '', function(err, result) {
-    if (result != null) {
+  Access.selectColumnsByColumn('friend', 'idUser', ['idFriendUser'], oUser.id, '', function(err, result) {
+    if (result) {
       var friends = [];
       for (var i = 0; i < result.length; i++) {
-        friends.push(result[i].idFriend);
-     }
-      return callback(null, friends);
+        friends.push(result[i].idFriendUser);
+    }
+
+      return callback(err, friends);
     } else {
       return callback(new Error('No Friends for idFriendUser ' + idFriendUser));
     }

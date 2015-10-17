@@ -33,7 +33,6 @@ function sendError(err, res) {
   }
 }
 
-
 function start() {
   global.app = express();
 
@@ -209,20 +208,30 @@ function start() {
 
   global.app.get('/friend', function(req, res) {
     console.log('listing friends');
-    async.waterfall([
-      async.apply(Friend.getSingleColumnListByUser, req.oUser),
-      User.getUsersByIdList
-      ],
-      function(err, results) {
-        if (err) {
-          res.status(500).send({error : err.message});
-        } else {
-          console.log(results);
-          res.send(results);
-        }
-      });
+    Friend.getSingleColumnListByUser(req.oUser, function FriendResultsCb(err, aFriendUserIds) {
+      if (err) {
+        res.status(500).send({error : err.message});
+      } else {
+        console.log("sending friend ids " + aFriendUserIds);
+        async.concat(aFriendUserIds, GetUserListIter, function FriendUsers(err, results) {
+            console.log("the results");
+            console.log(results);
+          if (err) {
+            res.status(500).send({error : err.message});
+          } else {
+            res.send(results);
+          }
+        });
+      }
+    });
   });
 
+  function GetUserListIter(iId, callback)
+  {
+    User.getUserById(iId, function(err, result) {
+      return callback(null, result);
+    });
+  }
   
   global.app.delete('/friend/:majorUuid/:minorUuid', function(req, res) {
     console.log('Deleting friends');

@@ -83,7 +83,6 @@ describe('Friends', function() {
              throw err;
           }
 
-          console.log(res);
           res.status.should.be.equal(200);
           res.body.should.have.property('majorUuid');
           res.body.should.have.property('minorUuid');
@@ -119,6 +118,7 @@ describe('Friends', function() {
   // Testing the List friend flow
   describe('List Friend', function() { 
     it('should allow a to list his friends', function(done) {
+      this.timeout(10000);
       request(sHost)
         .get('friend')
         .set({ 
@@ -130,16 +130,14 @@ describe('Friends', function() {
           if (err) {
              throw err;
           }
+          console.log("sending friend request");
 
-          /*
-          console.log(res);
-          res.body.should.containEql({
+          console.log(res.body);
+          res.body.should.matchAny({
             majorUuid : friendMajorUuid,
             minorUuid : friendMinorUuid
           });
-          */
-          //FIXME: not a true test, list friends end point currently 
-          //does not respond with sufficient info 
+
           res.status.should.be.equal(200);
           done();
         });

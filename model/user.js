@@ -10,6 +10,7 @@ var createdAt;
 var updatedAt;
 
 var Access = require('./simple_table');
+var async = require('async');
 
 // constructor
 function User(id, username, password, majorUuid, minorUuid, email, deviceToken, createdAt, updatedAt) {
@@ -26,6 +27,14 @@ function User(id, username, password, majorUuid, minorUuid, email, deviceToken, 
   this.deviceToken = deviceToken;
   this.createdAt = createdAt;
   this.updatedAt = updatedAt;
+}
+
+function ConvertDbResultToUser(mResult)
+{
+  return new User(mResult.idUser, mResult.username,
+    mResult.password, mResult.majorUuid,
+    mResult.minorUuid, mResult.email, mResult.deviceToken,
+    mResult.createdAt, mResult.updatedAt);
 }
 
 // save to db
@@ -85,63 +94,32 @@ function updateUser(id, post, callback) {
   console.log(query.sql);
 }
 
-User.getUserById = function(id, callback) {
-  Access.selectByColumn('user', 'idUser', id, '', function(err, result) {
-    if (result != null) {
-      var user = new User(result[0].idUser, result[0].username,
-        result[0].password, result[0].majorUuid,
-        result[0].minorUuid, result[0].email, result[0].deviceToken,
-        result[0].createdAt, result[0].updatedAt);
-      return callback(null, user);
-    } else {
-      return callback(new Error('No User with ID ' + id));
+function getUserBy(sColumn, value, callback) {
+  Access.selectByColumn('user', sColumn, value, '', function(err, result) {
+    if (err) {
+      return callback(new Error('Error looking for ' + sColumn + ' ' + value));
     }
+
+    if (result) {
+      console.log(result);
+      user = ConvertDbResultToUser(result[0]);
+    } else {
+      err = new Error('No User with ' + sColumn + ' ' + value);
+    }
+    return callback(err, user);
   });
 };
 
-User.getUsersByIdList = function(aIds, callback) {
-  Access.selectRowsByColumnValues('user', 'idUser', aIds, '', function(err, result) {
-    if (result != null) {
-      var user = new User(result[0].idUser, result[0].username,
-        result[0].password, result[0].majorUuid,
-        result[0].minorUuid, result[0].email, result[0].deviceToken,
-        result[0].createdAt, result[0].updatedAt);
-      return callback(null, user);
-    } else {
-      return callback(new Error('No User with ID ' + id));
-    }
-  });
+User.getUserById = function(id, callback) {
+    return getUserBy("idUser", id, callback);
 };
 
 User.getUserByUsername = function(username, callback) {
-  Access.selectByColumn('user', 'username', username, '', function(err, result) {
-    if (err) {
-      return callback(new Error('Error looking for user' + username));
-    }
-    if (result != null) {
-      var user = new User(result[0].idUser, result[0].username,
-        result[0].password, result[0].majorUuid,
-        result[0].minorUuid, result[0].email, result[0].deviceToken,
-        result[0].createdAt, result[0].updatedAt);
-      return callback(null, user);
-    } else {
-      return callback(new Error('No User with username ' + username));
-    }
-  });
+    return getUserBy("username", username, callback);
 };
 
 User.getUserByEmail = function(email, callback) {
-  Access.selectByColumn('user', 'email', email, '', function(err, result) {
-    if (result != null) {
-      var user = new User(result[0].idUser, result[0].username,
-        result[0].password, result[0].majorUuid,
-        result[0].minorUuid, result[0].email, result[0].deviceToken,
-        result[0].createdAt, result[0].updatedAt);
-      return callback(null, user);
-    } else {
-      return callback(new Error('No User with email ' + email));
-    }
-  });
+    return getUserBy("email", email, callback);
 };
 
 User.getUserByUuid = function(majorUuid, minorUuid, callback) {
@@ -156,10 +134,7 @@ User.getUserByUuid = function(majorUuid, minorUuid, callback) {
         return callback(new Error('No User with majorUuid ' + majorUuid + ' and minorUuid ' +
                         minorUuid));
       } else {
-        var user = new User(result[0].idUser, result[0].username,
-          result[0].password, result[0].majorUuid,
-          result[0].minorUuid, result[0].email, result[0].deviceToken,
-          result[0].createdAt, result[0].updatedAt);
+        var user = ConvertDbResultToUser(result[0]);
         return callback(null, user);
       }
     });

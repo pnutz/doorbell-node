@@ -9,25 +9,14 @@ function selectByColumn(table, column, id, queryadd, callback) {
     statement = 'SELECT * FROM ' + table + ' WHERE ' + column + ' = ' + id;
   }
 
-  var query = db.query(statement + ' ' + queryadd, function(err, rows) {
-    if (err) {
-      console.log(err.message);
-    }
-
-    if (rows.length !== 0) {
-      return callback(err, rows);
-    } else {
-      console.log('No rows selected');
-      return callback(null);
-    }
-  });
-  console.log(query.sql);
+  var query = db.query(statement + ' ' + queryadd, callback);
 }
 
 /**
  * @brief Weird function name, allows us to specify which columns to be returned
  */
 function selectColumnsByColumn(table, column, returnColumns, id, queryadd, callback) {
+  console.log("selectColumnByColumn");
   var statement;
   // Create a string from the desired columns
   var arrayLen = returnColumns.length;
@@ -47,14 +36,11 @@ function selectColumnsByColumn(table, column, returnColumns, id, queryadd, callb
       console.log(err.message);
     }
 
-    if (rows.length !== 0) {
-      return callback(err, rows);
-    } else {
-      console.log('No rows selected');
-      return callback(null);
-    }
+    if (rows.length === 0)
+      console.log("No Results for " + statement);
+
+    return callback(err, rows);
   });
-  console.log(query.sql);
 }
 
 /**
